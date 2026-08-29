@@ -37,10 +37,10 @@ The task machinery works. The household is empty — no agent identities, no not
 no scheduled workflows. Before an agent can wake here you need, in order:
 
 1. **git-crypt and a GPG key** — `notes/` is encrypted; without a key there is
-   nothing to read and no way to write. Install with `rudi install`, then
-   `notes init`.
-2. **At least one agent** — a home repo at `~/agents/<name>/home/` with its own
-   root `AGENTS.md`, plus a shared identity file at `notes/<name>.md` here.
+   nothing to read and no way to write. `rudi install` fetches git-crypt, then
+   `notes setup --gpg-key <fingerprint>` initializes the encrypted corpus.
+2. **At least one agent** — `shimmer agent:onboard <name>` walks through it, then
+   write the shared identity file at `notes/<name>.md` here.
 3. **Your own mail and CI credentials** — `OIKOS_EMAIL_DOMAIN` and
    `OIKOS_MAIL_HOST` default to the placeholder `oikos.local`, which does not
    resolve.

@@ -256,12 +256,15 @@ Use `gh repo clone`, not `git clone` — private repos need auth, and `gh` handl
 Nothing here works until these exist. In order:
 
 1. **git-crypt + a GPG key.** `notes/` is encrypted; without a key you cannot read
-   or write it. Install git-crypt (`rudi install`), generate a key, then
-   `notes init` to start an encrypted corpus of your own.
+   or write it. `rudi install` fetches git-crypt; generate a GPG key, then
+   `notes setup --gpg-key <fingerprint>` initializes an encrypted corpus of your
+   own. (`rudi init` is the lower-level equivalent if you want named keys.)
 2. **An owner identity.** Decide what agents call you, and replace "the owner"
    through this file.
-3. **At least one agent.** Create `~/agents/<name>/home/` as its own repo with a
-   root `AGENTS.md`, then write `notes/<name>.md` here as the shared identity file.
+3. **At least one agent.** `shimmer agent:onboard <name>` is the interactive path;
+   `shimmer agent:provision` handles credentials, GPG key, and GitHub secrets. It
+   produces a home repo at `~/agents/<name>/home/` with its own root `AGENTS.md`.
+   Then write `notes/<name>.md` here as the shared identity file.
 4. **Email + GitHub credentials**, if you want agents to communicate or run in CI.
    Set `OIKOS_EMAIL_DOMAIN` and `OIKOS_MAIL_HOST` to your own mail service —
    they default to the placeholder `oikos.local`, which does not resolve.
