@@ -22,18 +22,20 @@ usage = "5.1.0"
 yq = "4.53.6"
 
 # Shared KKL packages
-"shiv:browser" = "0.2"
+# desks and shell publish git tags but no GitHub releases, so shiv cannot
+# resolve a partial version for them — pin the exact tag.
 "shiv:chat" = "0.2"
 "shiv:codebase" = "0.4"
 "shiv:comments" = "0.3"
+"shiv:desks" = "v0.1.2"
 "shiv:emails" = "0.7"
 "shiv:modules" = "0.9"
 "shiv:notes" = "0.10"
 "shiv:rudi" = "0.5"
 "shiv:secrets" = "0.2"
 "shiv:sessions" = "0.5"
+"shiv:shell" = "v0.1.3"
 "shiv:shimmer" = "0.1"
-"shiv:threads" = "0.3"
 "shiv:websites" = "0.1"
 
 [_.codebase]
