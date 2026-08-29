@@ -1,0 +1,240 @@
+#!/usr/bin/env bash
+#MISE description="Fast Oikos-local orientation with bounded resident/visitor signals"
+#USAGE flag "--local" default=#false help="Skip chat and GitHub; show only local Oikos state"
+set -eo pipefail
+
+OIKOS_DIR="$MISE_CONFIG_ROOT"
+LOCAL_ONLY="${usage_local:-false}"
+MAX_ITEMS=5
+
+# shellcheck source=.mise/lib/welcome.sh
+. "$OIKOS_DIR/.mise/lib/welcome.sh"
+
+HEADING=212
+SUBHEAD=81
+DIM=240
+
+section() {
+  echo ""
+  gum style --bold --foreground "$HEADING" "$1"
+}
+
+notes_repo_status() {
+  local repo_dir="$1"
+  local first_name git_common_dir
+  enc_status="n/a"
+  notes_status="n/a"
+
+  if [ ! -d "$repo_dir/notes" ]; then
+    notes_status="no notes dir"
+    return
+  fi
+
+  git_common_dir=$(git -C "$repo_dir" rev-parse --git-common-dir 2>/dev/null || true)
+  if [ -n "$git_common_dir" ] && [ "${git_common_dir#/}" = "$git_common_dir" ]; then
+    git_common_dir="$repo_dir/$git_common_dir"
+  fi
+
+  if [ -z "$git_common_dir" ] || [ ! -d "$git_common_dir/git-crypt" ]; then
+    enc_status="⚠ key metadata missing → notes status"
+  else
+    enc_status="✓ key metadata present"
+  fi
+
+  if [ ! -f "$repo_dir/notes/.manifest" ]; then
+    notes_status="no manifest"
+    return
+  fi
+
+  first_name=$(awk -F '\t' 'NF >= 2 { print $2; exit }' "$repo_dir/notes/.manifest")
+  if [ -z "$first_name" ]; then
+    notes_status="manifest empty"
+  elif [ ! -f "$repo_dir/notes/$first_name" ]; then
+    notes_status="⚠ obfuscated or locked → notes status"
+  else
+    notes_status="✓ readable; edits checked by: notes status"
+    enc_status="✓ unlocked"
+  fi
+}
+
+identity_hint=""
+resident_name=""
+expected_github=""
+resident_record=""
+for candidate in "${CHAT_IDENTITY:-}" "${GIT_AUTHOR_NAME:-}" "${AGENT_NAME:-}"; do
+  [ -n "$candidate" ] || continue
+  [ -n "$identity_hint" ] || identity_hint="$candidate"
+  resident_record=$(oikos_welcome_resident_metadata "${OIKOS_WELCOME_IDENTITY_DIR:-$OIKOS_DIR/notes}" "$candidate" 2>/dev/null || true)
+  [ -n "$resident_record" ] && break
+done
+if [ -n "$resident_record" ]; then
+  resident_name=${resident_record%%$'\t'*}
+  expected_github=${resident_record#*$'\t'}
+fi
+
+printf '\n'
+gum style --bold --foreground "$HEADING" --border double --border-foreground "$DIM" \
+  --padding "0 2" "🏠 The Oikos"
+gum style --faint "$(date '+%A, %B %-d, %Y · %-I:%M %p')"
+
+section "Identity"
+if [ -n "$resident_name" ]; then
+  gum style "Resident: $resident_name"
+elif [ -n "$identity_hint" ]; then
+  gum style "Visitor: $identity_hint"
+else
+  gum style "Visitor: identity not supplied"
+fi
+
+section "Recent Oikos note changes"
+recent_rows=$(oikos_welcome_recent_note_changes "$OIKOS_DIR" "$MAX_ITEMS" || true)
+if [ -n "$recent_rows" ]; then
+  printf 'Note\tLatest local change\n%s\n' "$recent_rows" \
+    | gum table --print --separator $'\t' --border rounded \
+        --border.foreground "$DIM" --header.foreground "$SUBHEAD"
+else
+  gum style --faint "(no recent local note changes)"
+fi
+
+section "🧰 Oikos commands"
+(
+  printf 'Need\tCommand\n'
+  printf 'Authoritative notes state\tnotes status\n'
+  if [ -n "$resident_name" ]; then
+    printf 'Bounded Oikos chat\tchat read oikos --as %s --peek --all --last 5\n' "$resident_name"
+  fi
+  printf 'Deterministic local welcome\tmise welcome --local\n'
+  printf 'Browse GitHub tasks\tmise tasks ls | grep ^github:\n'
+) | gum table --print --separator $'\t' --border rounded \
+      --border.foreground "$DIM" --header.foreground "$SUBHEAD"
+
+if [ -d "$OIKOS_DIR/modules" ]; then
+  section "🧩 Modules"
+  module_rows=""
+  for mod_path in "$OIKOS_DIR"/modules/*/; do
+    [ -d "$mod_path/.git" ] || continue
+    name=$(basename "$mod_path")
+
+    if ! default_branch=$(git -C "$mod_path" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'); then
+      default_branch=""
+    fi
+    default_branch=${default_branch:-main}
+    if git -C "$mod_path" show-ref --verify --quiet "refs/remotes/origin/${default_branch}"; then
+      behind=$(git -C "$mod_path" rev-list --count "HEAD..origin/${default_branch}" 2>/dev/null || echo 0)
+      if [ "${behind:-0}" -gt 0 ]; then
+        pin_status="⚠ ${behind} behind recorded origin/${default_branch} → inspect before update"
+      else
+        pin_status="✓ at recorded origin/${default_branch}"
+      fi
+    else
+      pin_status="⚠ no recorded origin/${default_branch} → inspect remote state"
+    fi
+
+    if [ ! -f "$mod_path/notes/.manifest" ]; then
+      hook_status="n/a"
+    elif [ -f "$mod_path/.git/hooks/pre-commit" ]; then
+      hook_status="✓ installed"
+    else
+      hook_status="⚠ missing → notes install-hooks"
+    fi
+
+    module_rows+="${name},${pin_status},${hook_status}"$'\n'
+  done
+  if [ -n "$module_rows" ]; then
+    printf 'Module,Pin,Hooks\n%s' "$module_rows" \
+      | gum table --print --separator ',' --border rounded \
+          --border.foreground "$DIM" --header.foreground "$SUBHEAD"
+  else
+    gum style --faint "(no nested modules initialized; prepare one with: modules init <name>)"
+  fi
+fi
+
+section "📦 Oikos repository"
+cd "$OIKOS_DIR"
+branch=$(git branch --show-current 2>/dev/null)
+dirty=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+if [ "$dirty" -gt 0 ]; then
+  branch_status="$branch ($dirty uncommitted)"
+else
+  branch_status="$branch (clean)"
+fi
+
+tracking=$(git rev-parse --abbrev-ref '@{upstream}' 2>/dev/null || echo "")
+sync_status=""
+if [ -n "$tracking" ]; then
+  ahead=$(git rev-list "$tracking..HEAD" --count 2>/dev/null || echo 0)
+  behind=$(git rev-list "HEAD..$tracking" --count 2>/dev/null || echo 0)
+  [ "$ahead" -gt 0 ] && sync_status+="↑${ahead} ahead "
+  [ "$behind" -gt 0 ] && sync_status+="↓${behind} behind "
+  [ -z "$sync_status" ] && sync_status="up to date"
+fi
+
+repo_rows="Branch,${branch_status}"$'\n'
+[ -n "$sync_status" ] && repo_rows+="Remote,${sync_status}"$'\n'
+notes_repo_status "$OIKOS_DIR"
+repo_rows+="Encryption,${enc_status}"$'\n'
+repo_rows+="Notes,${notes_status}"
+printf 'Property,Status\n%s\n' "$repo_rows" \
+  | gum table --print --separator ',' --border rounded \
+      --border.foreground "$DIM" --header.foreground "$SUBHEAD"
+
+if [ "$LOCAL_ONLY" != true ]; then
+  live_dir=$(mktemp -d "${TMPDIR:-/tmp}/oikos-welcome-live.XXXXXX")
+  trap 'rm -rf "$live_dir"' EXIT
+  chat_started=false
+  github_started=false
+  chat_status=1
+  github_status=1
+
+  if [ -n "$resident_name" ] && command -v chat &>/dev/null && command -v jq &>/dev/null; then
+    oikos_welcome_chat_rows "$resident_name" "$MAX_ITEMS" > "$live_dir/chat.tsv" &
+    chat_pid=$!
+    chat_started=true
+  fi
+  if command -v gh &>/dev/null && command -v jq &>/dev/null; then
+    oikos_welcome_github_attention "$expected_github" "$MAX_ITEMS" > "$live_dir/github.tsv" &
+    github_pid=$!
+    github_started=true
+  fi
+
+  if [ "$chat_started" = true ]; then
+    if wait "$chat_pid"; then chat_status=0; else chat_status=$?; fi
+    section "💬 Recent Oikos chat"
+    if [ "$chat_status" -eq 0 ] && [ -s "$live_dir/chat.tsv" ]; then
+      printf 'Sender\tTime\tPreview\n' > "$live_dir/chat-table.tsv"
+      cat "$live_dir/chat.tsv" >> "$live_dir/chat-table.tsv"
+      gum table --print --separator $'\t' --border rounded \
+        --border.foreground "$DIM" --header.foreground "$SUBHEAD" < "$live_dir/chat-table.tsv"
+    else
+      gum style --faint "(Oikos chat unavailable; local welcome remains valid)"
+    fi
+  fi
+
+  if [ "$github_started" = true ]; then
+    if wait "$github_pid"; then github_status=0; else github_status=$?; fi
+    section "GitHub attention"
+    if [ "$github_status" -eq 0 ]; then
+      viewer=$(awk -F '\t' '$1 == "META" { print $2; exit }' "$live_dir/github.tsv")
+      github_rows=$(awk -F '\t' '$1 != "META"' "$live_dir/github.tsv")
+      gum style --faint "Verified account: $viewer"
+      if [ -n "$github_rows" ]; then
+        printf 'Why\tRepository\tItem\tTitle\tURL\n%s\n' "$github_rows" \
+          | gum table --print --separator $'\t' --border rounded \
+              --border.foreground "$DIM" --header.foreground "$SUBHEAD"
+      else
+        gum style --faint "(no current KKL/olavostauros attention items)"
+      fi
+    elif [ "$github_status" -eq 2 ]; then
+      actual=$(awk -F '\t' '$1 == "MISMATCH" { print $2; exit }' "$live_dir/github.tsv")
+      expected=$(awk -F '\t' '$1 == "MISMATCH" { print $3; exit }' "$live_dir/github.tsv")
+      gum style --faint "(active GitHub account $actual does not match resident $expected; skipped)"
+    else
+      gum style --faint "(GitHub identity or KKL attention unavailable; local welcome remains valid)"
+    fi
+  fi
+
+  rm -rf "$live_dir"
+  trap - EXIT
+fi
+
+printf '\n'

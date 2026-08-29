@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#MISE description="Send a directive message to the project comment channel"
+#USAGE arg "[message]" default="" help="Message to send; reads stdin when omitted"
+set -euo pipefail
+
+# Project default: execute the concrete helper without starting a second mise
+# process. The parent task already parsed and exported usage_message.
+# This lets inline directives use the short form:
+#   <!-- ! "message" | mise comment -->
+exec "$MISE_CONFIG_ROOT/.mise/tasks/comment/chat"

@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#MISE description="Run Oikos tests, lint, and welcome smoke"
+#MISE dir="{{config_root}}"
+#USAGE arg "[args]" var=#true default="" help="Optional mode (bats or codebase), or BATS files, directories, and arguments"
+#USAGE example "mise run test" header="Run all tests and gates"
+#USAGE example "mise run test bats test/github_repo_invitations.bats" header="Run one BATS file without other gates"
+#USAGE example "mise run test codebase" header="Run only Codebase lint"
+#USAGE example "mise run test --filter accept" header="Filter BATS tests, then run the other gates"
+#USAGE example "mise run test bats --jobs 1" header="Run BATS serially for debugging"
+set -euo pipefail
+
+export BATS_DEFAULT_TEST_TARGET="$MISE_CONFIG_ROOT/test"
+export BATS_NUMBER_OF_PARALLEL_JOBS="${BATS_NUMBER_OF_PARALLEL_JOBS:-4}"
+export BATS_PARALLEL_BINARY_NAME="${BATS_PARALLEL_BINARY_NAME:-rush}"
+export BATS_NO_PARALLELIZE_WITHIN_FILE="${BATS_NO_PARALLELIZE_WITHIN_FILE:-true}"
+
+run_bats=true
+run_codebase=true
+run_welcome=true
+
+case "${1:-all}" in
+  all)
+    [ "$#" -eq 0 ] || {
+      printf 'test: the all mode does not accept arguments; choose bats or codebase\n' >&2
+      exit 2
+    }
+    ;;
+  bats)
+    shift
+    run_codebase=false
+    run_welcome=false
+    ;;
+  codebase)
+    shift
+    [ "$#" -eq 0 ] || {
+      printf 'test: the codebase mode does not accept arguments\n' >&2
+      exit 2
+    }
+    run_bats=false
+    run_welcome=false
+    ;;
+  *) ;;
+esac
+
+if $run_bats; then
+  printf '\n== bats ==\n'
+  bats --print-output-on-failure "$@"
+fi
+
+if $run_codebase; then
+  printf '\n== codebase lint ==\n'
+  codebase lint
+fi
+
+if $run_welcome; then
+  printf '\n== welcome smoke ==\n'
+  welcome_output=$(env -u HUMAN_MD mise run -q welcome)
+  if printf '%s\n' "$welcome_output" | grep -q 'HUMAN.md'; then
+    echo "ERROR: welcome still presents legacy HUMAN.md as an orientation surface" >&2
+    exit 1
+  fi
+fi

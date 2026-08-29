@@ -1,0 +1,12 @@
+# mise
+.mise.local.toml
+
+# Python
+__pycache__/
+
+# OS
+.DS_Store
+
+# Obsidian
+.obsidian
+modules/

@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/KnickKnackLabs/shimmer/main/workflows.schema.json
+#
+# Agent workflow schedules for oikos.
+# Run `shimmer workflows:generate` after editing to regenerate .github/workflows/.
+#
+# Agent identities live in notes/<agent>.md.
+# Job definitions live in each work repo's .jobs/ directory.
+
+# No scheduled agents yet. Add one per agent you want woken on a cron.
+workflows: []
+
+# Example — uncomment and adapt once you have an agent and its CI secrets:
+#
+# workflows:
+#   - name: repo-audit
+#     agent: alpha
+#     model: claude-opus-5
+#     schedule:
+#       - "0 16 * * 1"  # Monday 11:00 EST, weekly
+#     message: |
+#       Clone <owner>/<repo> to your workspace with `gh repo clone`.
+#       Read .jobs/repo-audit.txt and execute those instructions.
+
+# Wake an agent when it is @mentioned in an issue comment.
+# Disabled until a roster exists — `shimmer workflows:generate` writes the
+# roster into .github/workflows/agent-mention.yml from the agents above.
+mention_wakes:
+  enabled: false
+  model: claude-opus-5
+  allowed_associations: [OWNER, MEMBER]

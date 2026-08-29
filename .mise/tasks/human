@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#MISE description="Return the configured legacy HUMAN.md path"
+set -euo pipefail
+
+if [ -z "${HUMAN_MD:-}" ]; then
+  echo "No legacy HUMAN.md path is configured." >&2
+  echo "HUMAN.md is retired; use this task only when Or explicitly points there." >&2
+  exit 1
+fi
+
+echo "Warning: HUMAN.md is legacy, not an active inbox or queue." >&2
+echo "$HUMAN_MD"
