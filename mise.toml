@@ -6,6 +6,10 @@
 OIKOS_EMAIL_DOMAIN = "{{ env.OIKOS_EMAIL_DOMAIN | default(value='stauros.family') }}"
 OIKOS_MAIL_HOST = "{{ env.OIKOS_MAIL_HOST | default(value='mail.privateemail.com') }}"
 
+# Credential backend for `secrets`. 1Password on Linux (keychain is macOS-only);
+# templated so tests and one-off overrides still win.
+SECRETS_PROVIDER = "{{ env.SECRETS_PROVIDER | default(value='1password') }}"
+
 [settings]
 experimental = true
 quiet = true
