@@ -36,3 +36,18 @@ echo "export GIT_AUTHOR_NAME='$AGENT'"
 echo "export GIT_COMMITTER_NAME='$AGENT'"
 echo "export GIT_AUTHOR_EMAIL='$AGENT@$DOMAIN'"
 echo "export GIT_COMMITTER_EMAIL='$AGENT@$DOMAIN'"
+
+# Secret provider.
+#
+# 1Password authorizes every `op` call individually through the desktop app,
+# and the approval cannot be cached — it authorizes the calling process, and a
+# shell pipeline is a new process each time. Reading a token per command means
+# an authorization dialog per command.
+#
+# So prefer the local keyring when it can actually serve this agent. The probe
+# is the switch: it only reports success when the agent's token is really
+# cached, so a machine without the cache (or without the libsecret provider)
+# silently keeps 1Password. See [[agent-credentials]] for how to populate it.
+if secrets get "$AGENT/github-pat" --provider libsecret >/dev/null 2>&1; then
+  echo "export SECRETS_PROVIDER='libsecret'"
+fi

@@ -44,7 +44,10 @@ yq = "4.53.6"
 "shiv:modules" = "0.9"
 "shiv:notes" = "0.10"
 "shiv:rudi" = "0.5"
-"shiv:secrets" = "0.2"
+# Running from a local shiv install of knack's fork until the libsecret
+# provider lands upstream — see notes/agent-credentials.md. Restore this pin
+# and `shiv remove secrets` to go back to the released package.
+# "shiv:secrets" = "0.2"
 "shiv:sessions" = "0.5"
 "shiv:shell" = "v0.1.3"
 "shiv:shimmer" = "0.1"
