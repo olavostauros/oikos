@@ -1,3 +1,11 @@
+[env]
+# Household mail identity. Namecheap Private Email hosts stauros.family;
+# mail.privateemail.com is the host whose TLS cert actually covers it
+# (mail.stauros.family resolves to the same IP but is not on the cert).
+# Templated so an explicit export still wins — tests pin their own values.
+OIKOS_EMAIL_DOMAIN = "{{ env.OIKOS_EMAIL_DOMAIN | default(value='stauros.family') }}"
+OIKOS_MAIL_HOST = "{{ env.OIKOS_MAIL_HOST | default(value='mail.privateemail.com') }}"
+
 [settings]
 experimental = true
 quiet = true

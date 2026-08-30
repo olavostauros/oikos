@@ -19,7 +19,12 @@ setup() {
   git -C "$HOME_REPO" commit -q -m fixture
   : > "$SECRET_LOG"
   : > "$EMAIL_LOG"
+  # Pin the mail identity: these assertions must not depend on the household's
+  # configured domain in mise.toml [env].
+  OIKOS_EMAIL_DOMAIN=oikos.local
+  OIKOS_MAIL_HOST=mail.oikos.local
   export TMPBIN HOME_REPO SECRET_LOG EMAIL_LOG PASSWORD_CAPTURE
+  export OIKOS_EMAIL_DOMAIN OIKOS_MAIL_HOST
   write_email_mocks
 }
 

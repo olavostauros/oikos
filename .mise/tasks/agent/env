@@ -22,5 +22,17 @@ fi
 
 # --- Environment variables this home wants set for its agents ---
 
+DOMAIN="${OIKOS_EMAIL_DOMAIN:-oikos.local}"
+
 # Chat identity — used by `chat read` to track per-agent read cursors
 echo "export CHAT_IDENTITY='$AGENT'"
+
+# Git and mail identity.
+#
+# This overrides `shimmer as <agent>`, which hardcodes @ricon.family
+# (shimmer/.mise/tasks/as:87) — another household's domain, in a read-only
+# package. Source this AFTER `shimmer as` so these values win.
+echo "export GIT_AUTHOR_NAME='$AGENT'"
+echo "export GIT_COMMITTER_NAME='$AGENT'"
+echo "export GIT_AUTHOR_EMAIL='$AGENT@$DOMAIN'"
+echo "export GIT_COMMITTER_EMAIL='$AGENT@$DOMAIN'"

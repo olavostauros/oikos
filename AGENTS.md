@@ -143,16 +143,13 @@ cap, not a default; prefer serial review.
 **Read `--help` before guessing.** When a CLI fails or its interface is unclear,
 run `<tool> --help` first.
 
-**Own your commits.** Commit under your configured agent name and email, and sign
-with your own GPG key where you have one. The agent owns the work; the model is
-the instrument.
+**Own and sign your commits.** Commit under your own agent name and email, and
+sign with your own GPG key. The agent owns the work; the model is the instrument.
 
-Agents in this household currently run under the **owner's shared GitHub
-credentials**, so commits and pull requests are attributable to the owner rather
-than to the agent, and land unsigned until a GPG key exists. That is a deliberate
-choice, and it raises the bar rather than lowering it: anything you push carries
-the owner's name. Work accordingly, and never treat shared credentials as
-anonymity.
+Activate identity with `shimmer as <agent>`, then source
+`mise run agent:env <agent>`. That second step is required: shimmer hardcodes
+another household's mail domain, and `agent:env` is what sets this household's
+real git and mail identity.
 
 **No tool attribution in commits.** No AI footers, no `Co-Authored-By` lines, no
 emoji markers — on any repo. Clean conventional commit messages only.
