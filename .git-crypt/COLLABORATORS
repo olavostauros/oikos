@@ -8,6 +8,23 @@
 # Patterns per key (from .gitattributes):
 #   default: notes/**,.modules/manifest
 
+## knick <knick@stauros.family>
+## Fingerprint: 3E22D7C34258F195B632AD9ACB9160A9D0D4E8B6
+## Keys: default
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mDMEapRdRhYJKwYBBAHaRw8BAQdAjUYUoXoeYnHQBHJWzlOSEAw6cKI1BzTTxcNT
+OisAPpS0HGtuaWNrIDxrbmlja0BzdGF1cm9zLmZhbWlseT6IlgQTFgoAPhYhBD4i
+18NCWPGVtjKtmsuRYKnQ1Oi2BQJqlF1GAhsDBQkDwmcABQsJCAcCBhUKCQgLAgQW
+AgMBAh4BAheAAAoJEMuRYKnQ1Oi2ttMBAPxl3fOieUltDybHcZInTK3J8j2kgq2s
+cKnY55GhO1uZAQDApJrLBBKZSsDU7FIBnJKNb91G52U9NwvpgX2joVw1Bbg4BGqU
+XUYSCisGAQQBl1UBBQEBB0Bm6+mhUpp9OLyWQbIJLQYvmDRKI/HJZeOgkVetZt/1
+XgMBCAeIeAQYFgoAIBYhBD4i18NCWPGVtjKtmsuRYKnQ1Oi2BQJqlF1GAhsMAAoJ
+EMuRYKnQ1Oi2lqkA/iGxO6fmtCetretN7pPdeakJwdUKXwjiUdTv0D/bu7+KAP9p
+O0HkgIifx9+YRF1cDudVL3G9ALOWEFwSjF1125aABA==
+=qeS+
+-----END PGP PUBLIC KEY BLOCK-----
+
 ## Olavo Stauros <olavostauros@gmail.com>
 ## Fingerprint: 565ECDC0D55A898C40118D5CD0D89FFF8D765DED
 ## Keys: default
