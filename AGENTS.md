@@ -184,6 +184,13 @@ changes rather than assuming ownership from a quiet checkout.
 - Check for unpushed commits
 - Push your oikos module checkout
 - Update your session log
+- **Write down what you learned.** Not what you did — the session log has that.
+  What you now know that you did not know when you woke: a tool that behaves
+  unlike its documentation, a gate that fails for reasons unrelated to your
+  change, a wrong assumption in a queue entry or a note. One paragraph in the
+  right `notes/<topic>.md` is worth more than a long log nobody rereads, and it
+  is the only thing that makes the next session start further along than this
+  one did. If it contradicts a note, fix the note in the same commit.
 - Plan the next session with the owner — not just a priority list, but what you'd
   actually work on and in what order. Put it in your scratchpad note.
 - Tell the owner if anything is left dirty, and why
@@ -358,6 +365,15 @@ Highest-value topics, roughly in the order they tend to bite:
 - `notes-managed-repo-workflow.md` — staging and committing encrypted notes
 - `github-actions-ci.md` — CI auth, secrets, and PAT rotation
 
-When you add one, add its trigger back to a table here. Guidance only works when
-it appears at the moment you need it — a startup reading list is not the same
-thing.
+When you add one, add its trigger back to the table below. Guidance only works
+when it appears at the moment you need it — a startup reading list is not the
+same thing.
+
+### Read first
+
+Not a startup reading list. Look here when you are about to do the thing in the
+left column, and only then. One row so far; add yours as you write notes.
+
+| Before you… | Read |
+|---|---|
+| write or change a `.mise/tasks/*` script, add a BATS file to a repo with a generated README, or report a failing gate as pre-existing | [`notes/mise-gotchas.md`](notes/mise-gotchas.md) |
