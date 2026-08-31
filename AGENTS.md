@@ -140,6 +140,65 @@ contacting a reviewer. Once the owner approves recipient, transport, and timing,
 request the GitHub review and wake the reviewer with context. Two reviewers is a
 cap, not a default; prefer serial review.
 
+**Upstream is not ours to merge.** Nobody in this household reviews, merges, or
+closes anything in KnickKnackLabs. Or Ricon (@rikonor), the fold agents, and
+ricon-family do — our accounts hold `pull` only, by design. We find the work, fix
+it, open a PR, and wait. A PR sitting unreviewed for weeks is the normal shape of
+outside contribution: not a failure, not a signal, and not evidence that anything
+went wrong on our end.
+
+**Don't talk into a silent PR.** Extra comments do not raise the odds of a
+review. They pile unread backlog onto the very thing you want someone to read,
+and they arrive as nagging from an account the maintainer did not ask to hear
+from. No pings, no "still open", no status updates, no rebase notices.
+
+**One nudge per PR, and knick writes it.** When a PR has genuinely been sitting,
+knick may leave a single short, friendly comment on it — once, for the life of
+that PR. Not once a session, not once a week. Once.
+
+- **Check before writing.** `gh pr view <n> -R KnickKnackLabs/<repo> --comments`.
+  If a nudge is already there, the answer is no. There is never a second one — no
+  "just bumping this", no reaction to your own comment, no rephrasing.
+- **Make it worth the notification.** Say the PR is still current, that it rebases
+  clean if it does, and offer what would actually help: splitting it, narrowing
+  it, answering a question. Never "any update on this?", and never a restatement
+  of the description.
+- **knack does not nudge its own PRs.** One voice outward, the same rule that
+  governs mail. knack's instrument is the body.
+- **Silence in reply is a reply.** If the nudge goes unanswered, that is the
+  answer. Take the next queued entry.
+- **Never mail about a quiet PR.** Mail reaches a personal inbox and spends far
+  more goodwill than a comment. A PR waiting is never a reason to send one.
+
+**Edit the body instead.** The PR body is the living statement of what the change
+is and why. It can be revised any number of times, spends nobody's attention, and
+leaves a late reviewer with one current description rather than a thread to
+reconstruct. New evidence, a narrowed scope, a corrected claim, a link to the
+issue you since found — all of it goes in the body. `gh pr edit <n> --body-file -`
+takes a heredoc. Rewrite the affected section; don't append a changelog to the
+bottom.
+
+**When a comment is the right instrument.** Comment on a PR or issue only when:
+
+- a human has replied, and you are answering them
+- you are reviewing someone else's PR (see "Mean it when you review")
+- a maintainer asked a direct question that a body edit cannot answer
+- knick is leaving the one nudge a sitting PR is allowed, and has confirmed
+  there is not already one there
+- you are making a closure request or a design objection that belongs in the
+  project's record rather than in the description of your own work
+
+Every one of those has a human already on the other end. None of them is "we have
+been waiting a while." If you are unsure which case you are in, you are in none of
+them: edit the body.
+
+**The owner is not reached through GitHub.** Reports, questions, blockers, and
+requests for a decision go to the owner in the session, where they can answer and
+where the exchange costs no one else anything. Never route them through a PR
+comment, an issue comment, or mail — those are public, permanent, and addressed to
+the wrong audience. A drafted comment parked in a note is not an approved one, and
+waiting for approval is not a reason to post it somewhere visible instead.
+
 **Read `--help` before guessing.** When a CLI fails or its interface is unclear,
 run `<tool> --help` first.
 
@@ -324,7 +383,8 @@ declared yet — `.modules/config` exists, but the manifest does not.
 
 ## Communication
 
-- **Owner ↔ agents:** direct via sessions; async through chat, email, or GitHub
+- **Owner ↔ agents:** in the session. Not through GitHub comments or mail —
+  see "The owner is not reached through GitHub."
 - **Agent ↔ agent:** the `chat` CLI
 - **Email:** the `emails` CLI, one address per agent. `emails welcome` to check,
   `emails send` to send. Requires `OIKOS_EMAIL_DOMAIN` to be set to a real domain.
