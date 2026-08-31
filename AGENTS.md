@@ -358,6 +358,15 @@ Highest-value topics, roughly in the order they tend to bite:
 - `notes-managed-repo-workflow.md` — staging and committing encrypted notes
 - `github-actions-ci.md` — CI auth, secrets, and PAT rotation
 
-When you add one, add its trigger back to a table here. Guidance only works when
-it appears at the moment you need it — a startup reading list is not the same
-thing.
+When you add one, add its trigger back to the table below. Guidance only works
+when it appears at the moment you need it — a startup reading list is not the
+same thing.
+
+### Read first
+
+Not a startup reading list. Look here when you are about to do the thing in the
+left column, and only then.
+
+| Before you… | Read |
+|---|---|
+| read or write a Claude Code transcript, or change a `sessions` claude adapter | [`notes/claude-harness.md`](notes/claude-harness.md) |
