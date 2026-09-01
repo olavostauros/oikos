@@ -123,6 +123,39 @@ write them, or at minimum smoke-test manually and say what you verified.
 **Merge, don't squash.** Use `gh pr merge --merge` to preserve branch history.
 Keep branch commits clean before merging; the branch is the narrative.
 
+**Small PRs, and never stacked.** Owner-directed 2026-09-01. Every upstream PR
+is cut fresh from a synced `upstream/<default-branch>` and stands on its own. A
+branch is never cut from another topic branch, and a PR never depends on another
+PR being merged first.
+
+This is a hard rule, not a preference. It applies even when the second change is
+"obviously" built on the first, and even when cutting fresh means repeating a
+little work.
+
+- **Cut from upstream, always.** `git fetch upstream && git switch -c <branch>
+  upstream/main`. Record the base commit in the queue entry's `branch:` field,
+  the way
+  [`knack/op-check-probe`](https://github.com/KnickKnackLabs/secrets/pull/16)
+  already does ("cut from `upstream/main` (`4b7da0d`) so it is independent of
+  #15"). That entry is the model; copy it.
+- **One reviewable idea per PR.** A fix and its regression test ship together
+  when the test is small. A test that needs its own harness is its own PR, cut
+  from upstream — not from the fix branch.
+- **When one issue spans several changes, they are siblings, not a chain.**
+  Independent PRs off the same upstream base, each mergeable alone and in any
+  order. If two of them genuinely cannot be independent, that is a signal to
+  make one PR, not to stack two.
+- **Never open PRs for the same fix in two repos.** When an issue names more
+  than one candidate site, wait for the maintainer to pick, then open one PR in
+  the repo they chose.
+- **If you find yourself needing a stack, stop and say so.** Report it to the
+  owner and to knick rather than building it. A stack is a scoping mistake
+  surfacing late, and the fix is smaller scope, not more branches.
+
+Household repos (`~/oikos`, your home repo) are exempt from the fresh-cut
+requirement — they are a shared trunk, not a review queue — but the "one
+reviewable idea" habit still applies there.
+
 **Routine commits and pushes in household repos.** Owner-authorized 2026-08-31.
 This is a deliberate loosening, granted by the owner; it is not drift, and a
 later improvement loop should not revert it as such.
