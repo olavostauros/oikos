@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# Refuse a commit whose author would be wrong or unsigned.
+#
+# ~/oikos is one working tree shared by every agent, at a path outside
+# ~/agents/, so the includeIf that resolves each agent's key in its own
+# workspace cannot apply here. Signing reaches this repo only as GIT_CONFIG_*
+# exported by `shimmer as`, and the Bash tool starts a fresh shell per call —
+# so a commit made without re-sourcing lands unsigned and authored by the
+# owner. That has already happened 36 times; see notes/household-backlog.md.
+#
+# OIKOS_OWNER_COMMIT=1 is the human's escape hatch, not an agent's. An agent
+# that sets it to get past this guard is disabling a guard to make a session
+# pass, which the Tier 3 rules forbid outright.
+set -eo pipefail
+
+AGENTS_RE='^(knick|knack)$'
+
+author="${GIT_AUTHOR_NAME:-$(git config user.name 2>/dev/null || true)}"
+signing="$(git config commit.gpgsign 2>/dev/null || true)"
+key="$(git config user.signingkey 2>/dev/null || true)"
+
+fail() {
+  echo "ERROR: refusing this commit — $1" >&2
+  echo "" >&2
+  echo "Activate first, in this same shell:" >&2
+  echo "  source ~/.claude/oikos/activate.sh <agent>" >&2
+  echo "" >&2
+  echo "If you are the owner and meant to commit as yourself:" >&2
+  echo "  OIKOS_OWNER_COMMIT=1 git commit ..." >&2
+  exit 1
+}
+
+if [ "${OIKOS_OWNER_COMMIT:-}" = "1" ]; then
+  exit 0
+fi
+
+if [[ "$author" =~ $AGENTS_RE ]]; then
+  # An agent is committing. Partial activation is the failure to catch: the
+  # name is right but the signing config never arrived.
+  [ "$signing" = "true" ] || fail "author is '$author' but commit.gpgsign is not true"
+  [ -n "$key" ] || fail "author is '$author' but no user.signingkey is set"
+  exit 0
+fi
+
+if [ "${CLAUDECODE:-}" = "1" ]; then
+  # An agent session that never activated. Left alone this commits as the
+  # owner, unsigned, and the household's record is misattributed.
+  fail "agent session with no activated identity (author would be '${author:-unset}')"
+fi
+
+exit 0

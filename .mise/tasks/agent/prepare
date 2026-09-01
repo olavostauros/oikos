@@ -46,6 +46,19 @@ init_requested_repo_modules() {
   modules init "${modules[@]}"
 }
 
+install_repo_hooks() {
+  local hooks_dir src
+  hooks_dir=$(git rev-parse --git-path hooks) || return 0
+  case "$hooks_dir" in /*) ;; *) hooks_dir="$MISE_CONFIG_ROOT/$hooks_dir" ;; esac
+
+  for src in hooks/*; do
+    [ -f "$src" ] || continue
+    mkdir -p "$hooks_dir/pre-commit.d"
+    install -m 0755 "$src" "$hooks_dir/pre-commit.d/$(basename "$src")"
+    log "hooks: installed $(basename "$src")"
+  done
+}
+
 trust_shiv_package_config shiv:rudi
 trust_shiv_package_config shiv:notes
 trust_shiv_package_config shiv:modules
@@ -73,5 +86,7 @@ if [ -f .modules/config ]; then
 else
   log "modules: no .modules/config; skipping"
 fi
+
+install_repo_hooks
 
 log "done"
