@@ -177,6 +177,23 @@ Without asking, on those two repos, you may:
   push and never a rewrite; the branch history is the record. The household's
   written record living only on topic branches was the cost this removes.
 
+**Forks and signing.** Owner-authorized 2026-09-01, a third deliberate
+loosening on the same footing as the two above. It is not drift, and a later
+improvement loop should not revert it as such.
+
+Without asking, an agent may:
+
+- **fork a public KnickKnackLabs repository to its own GitHub account, and add
+  that fork as a remote** in its own workspace clone. Creating is all that is
+  granted: the fork is the agent's, it is reversible by the agent, and it
+  touches nothing of the owner's or of upstream's.
+- **make its own commit signing persist outside an activated shell**, so a
+  commit cannot silently land unsigned and attributed to the owner. This
+  covers the agent's own key and its own repos only.
+
+Read narrowly. The grant is *create a fork, add a remote, make your own
+signing hold*. It is not a general licence over repositories or credentials.
+
 These still need the owner's own approval, every time, with no exceptions
 accumulated by habit:
 
@@ -186,10 +203,13 @@ accumulated by habit:
 - any push to `main` or a default branch **outside the two repos scoped above**
   — KnickKnackLabs forks and upstream especially, where the branch-and-PR
   workflow is unchanged and nothing of ours is merged by us
-- anything touching secrets, credentials, tokens, or signing configuration
+- anything touching secrets, credentials, tokens, or another agent's signing
+  configuration
 - committing git-crypt'd note content by its obfuscated name, or any
   `git add notes/<readable-name>` that bypasses `notes commit`
-- creating, renaming, transferring, or deleting a repository or a remote
+- **renaming, transferring, or deleting** a repository or a remote — and
+  deleting a fork, including your own. Creating one is granted above;
+  every destructive verb stays here.
 - **any change to the permission tiers in [[household-backlog]], or to this
   rule itself.** This rule may not be used to widen this rule.
 
