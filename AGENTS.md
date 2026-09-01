@@ -138,6 +138,11 @@ Without asking, on those two repos, you may:
 - push further commits to a branch you already pushed, fast-forward only
 - use the owner's credentials as transport where you have no push access
   (`env -u GH_TOKEN git push`), saying so in your report
+- **merge your own topic branches into `main` in those two repos, and push
+  `main` to `origin`.** Owner-authorized 2026-09-01, a second deliberate
+  loosening on the same footing as the one above. Use `--merge`, never a force
+  push and never a rewrite; the branch history is the record. The household's
+  written record living only on topic branches was the cost this removes.
 
 These still need the owner's own approval, every time, with no exceptions
 accumulated by habit:
@@ -145,7 +150,9 @@ accumulated by habit:
 - `--force`, `--force-with-lease`, or any history rewrite — rebase of pushed
   commits, `commit --amend` after pushing, filter-branch, or re-authoring
 - deleting a branch, local or remote
-- any push to `main` or a default branch, and any merge or pull request into one
+- any push to `main` or a default branch **outside the two repos scoped above**
+  — KnickKnackLabs forks and upstream especially, where the branch-and-PR
+  workflow is unchanged and nothing of ours is merged by us
 - anything touching secrets, credentials, tokens, or signing configuration
 - committing git-crypt'd note content by its obfuscated name, or any
   `git add notes/<readable-name>` that bypasses `notes commit`
