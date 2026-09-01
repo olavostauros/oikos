@@ -123,6 +123,45 @@ write them, or at minimum smoke-test manually and say what you verified.
 **Merge, don't squash.** Use `gh pr merge --merge` to preserve branch history.
 Keep branch commits clean before merging; the branch is the narrative.
 
+**Routine commits and pushes in household repos.** Owner-authorized 2026-08-31.
+This is a deliberate loosening, granted by the owner; it is not drift, and a
+later improvement loop should not revert it as such.
+
+**Scope: `~/oikos` and your own home repo (`~/agents/<name>/home`). Nothing
+else.** It does not extend to KnickKnackLabs forks or to upstream PRs, which
+keep the existing branch-and-PR workflow. Only the owner widens this scope.
+
+Without asking, on those two repos, you may:
+
+- stage and commit your own work on a topic branch you created
+- push that branch to `origin`, including `-u` to set tracking
+- push further commits to a branch you already pushed, fast-forward only
+- use the owner's credentials as transport where you have no push access
+  (`env -u GH_TOKEN git push`), saying so in your report
+- **merge your own topic branches into `main` in those two repos, and push
+  `main` to `origin`.** Owner-authorized 2026-09-01, a second deliberate
+  loosening on the same footing as the one above. Use `--merge`, never a force
+  push and never a rewrite; the branch history is the record. The household's
+  written record living only on topic branches was the cost this removes.
+
+These still need the owner's own approval, every time, with no exceptions
+accumulated by habit:
+
+- `--force`, `--force-with-lease`, or any history rewrite — rebase of pushed
+  commits, `commit --amend` after pushing, filter-branch, or re-authoring
+- deleting a branch, local or remote
+- any push to `main` or a default branch **outside the two repos scoped above**
+  — KnickKnackLabs forks and upstream especially, where the branch-and-PR
+  workflow is unchanged and nothing of ours is merged by us
+- anything touching secrets, credentials, tokens, or signing configuration
+- committing git-crypt'd note content by its obfuscated name, or any
+  `git add notes/<readable-name>` that bypasses `notes commit`
+- creating, renaming, transferring, or deleting a repository or a remote
+- **any change to the permission tiers in [[household-backlog]], or to this
+  rule itself.** This rule may not be used to widen this rule.
+
+You may narrow this at any time. Narrowing is yours; widening is the owner's.
+
 **Mean it when you review.**
 - Don't hedge with "not blocking, but…". If you'd flag it in your own code, flag it.
 - **Calibrate at 60%:** if 0% is auto-approve and 100% is auto-reject, aim for 60% —
@@ -139,6 +178,65 @@ Keep branch commits clean before merging; the branch is the narrative.
 contacting a reviewer. Once the owner approves recipient, transport, and timing,
 request the GitHub review and wake the reviewer with context. Two reviewers is a
 cap, not a default; prefer serial review.
+
+**Upstream is not ours to merge.** Nobody in this household reviews, merges, or
+closes anything in KnickKnackLabs. Or Ricon (@rikonor), the fold agents, and
+ricon-family do — our accounts hold `pull` only, by design. We find the work, fix
+it, open a PR, and wait. A PR sitting unreviewed for weeks is the normal shape of
+outside contribution: not a failure, not a signal, and not evidence that anything
+went wrong on our end.
+
+**Don't talk into a silent PR.** Extra comments do not raise the odds of a
+review. They pile unread backlog onto the very thing you want someone to read,
+and they arrive as nagging from an account the maintainer did not ask to hear
+from. No pings, no "still open", no status updates, no rebase notices.
+
+**One nudge per PR, and knick writes it.** When a PR has genuinely been sitting,
+knick may leave a single short, friendly comment on it — once, for the life of
+that PR. Not once a session, not once a week. Once.
+
+- **Check before writing.** `gh pr view <n> -R KnickKnackLabs/<repo> --comments`.
+  If a nudge is already there, the answer is no. There is never a second one — no
+  "just bumping this", no reaction to your own comment, no rephrasing.
+- **Make it worth the notification.** Say the PR is still current, that it rebases
+  clean if it does, and offer what would actually help: splitting it, narrowing
+  it, answering a question. Never "any update on this?", and never a restatement
+  of the description.
+- **knack does not nudge its own PRs.** One voice outward, the same rule that
+  governs mail. knack's instrument is the body.
+- **Silence in reply is a reply.** If the nudge goes unanswered, that is the
+  answer. Take the next queued entry.
+- **Never mail about a quiet PR.** Mail reaches a personal inbox and spends far
+  more goodwill than a comment. A PR waiting is never a reason to send one.
+
+**Edit the body instead.** The PR body is the living statement of what the change
+is and why. It can be revised any number of times, spends nobody's attention, and
+leaves a late reviewer with one current description rather than a thread to
+reconstruct. New evidence, a narrowed scope, a corrected claim, a link to the
+issue you since found — all of it goes in the body. `gh pr edit <n> --body-file -`
+takes a heredoc. Rewrite the affected section; don't append a changelog to the
+bottom.
+
+**When a comment is the right instrument.** Comment on a PR or issue only when:
+
+- a human has replied, and you are answering them
+- you are reviewing someone else's PR (see "Mean it when you review")
+- a maintainer asked a direct question that a body edit cannot answer
+- knick is leaving the one nudge a sitting PR is allowed, and has confirmed
+  there is not already one there
+- you are making a closure request or a design objection that belongs in the
+  project's record rather than in the description of your own work
+
+Every one of those has a human already on the other end. None of them is "we have
+been waiting a while." If you are unsure which case you are in, you are in none of
+them: edit the body.
+
+**The owner is not reached through GitHub.** Reports, questions, blockers, and
+requests for a decision go to the owner in the session, where they can answer and
+where the exchange costs no one else anything. Never route them through a PR
+comment, an issue comment, or mail — those are public, permanent, and addressed to
+the wrong audience. A drafted comment parked in a note is not an approved one, and
+waiting for approval is not a reason to post it somewhere visible instead.
 
 **Read `--help` before guessing.** When a CLI fails or its interface is unclear,
 run `<tool> --help` first.
@@ -184,6 +282,13 @@ changes rather than assuming ownership from a quiet checkout.
 - Check for unpushed commits
 - Push your oikos module checkout
 - Update your session log
+- **Write down what you learned.** Not what you did — the session log has that.
+  What you now know that you did not know when you woke: a tool that behaves
+  unlike its documentation, a gate that fails for reasons unrelated to your
+  change, a wrong assumption in a queue entry or a note. One paragraph in the
+  right `notes/<topic>.md` is worth more than a long log nobody rereads, and it
+  is the only thing that makes the next session start further along than this
+  one did. If it contradicts a note, fix the note in the same commit.
 - Plan the next session with the owner — not just a priority list, but what you'd
   actually work on and in what order. Put it in your scratchpad note.
 - Tell the owner if anything is left dirty, and why
@@ -317,7 +422,8 @@ declared yet — `.modules/config` exists, but the manifest does not.
 
 ## Communication
 
-- **Owner ↔ agents:** direct via sessions; async through chat, email, or GitHub
+- **Owner ↔ agents:** in the session. Not through GitHub comments or mail —
+  see "The owner is not reached through GitHub."
 - **Agent ↔ agent:** the `chat` CLI
 - **Email:** the `emails` CLI, one address per agent. `emails welcome` to check,
   `emails send` to send. Requires `OIKOS_EMAIL_DOMAIN` to be set to a real domain.
@@ -358,6 +464,15 @@ Highest-value topics, roughly in the order they tend to bite:
 - `notes-managed-repo-workflow.md` — staging and committing encrypted notes
 - `github-actions-ci.md` — CI auth, secrets, and PAT rotation
 
-When you add one, add its trigger back to a table here. Guidance only works when
-it appears at the moment you need it — a startup reading list is not the same
-thing.
+When you add one, add its trigger back to the table below. Guidance only works
+when it appears at the moment you need it — a startup reading list is not the
+same thing.
+
+### Read first
+
+Not a startup reading list. Look here when you are about to do the thing in the
+left column, and only then. One row so far; add yours as you write notes.
+
+| Before you… | Read |
+|---|---|
+| write or change a `.mise/tasks/*` script, add a BATS file to a repo with a generated README, or report a failing gate as pre-existing | [`notes/mise-gotchas.md`](notes/mise-gotchas.md) |
