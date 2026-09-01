@@ -561,8 +561,9 @@ same thing.
 ### Read first
 
 Not a startup reading list. Look here when you are about to do the thing in the
-left column, and only then. One row so far; add yours as you write notes.
+left column, and only then. Add yours as you write notes.
 
 | Before you… | Read |
 |---|---|
 | write or change a `.mise/tasks/*` script, add a BATS file to a repo with a generated README, or report a failing gate as pre-existing | [`notes/mise-gotchas.md`](notes/mise-gotchas.md) |
+| read or write a Claude Code transcript, or change a `sessions` claude adapter | [`notes/claude-harness.md`](notes/claude-harness.md) |
