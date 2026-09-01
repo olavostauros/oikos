@@ -50,6 +50,11 @@ yq = "4.53.6"
 # "shiv:secrets" = "0.2"
 "shiv:sessions" = "0.5"
 "shiv:shell" = "v0.1.3"
+# Floating on purpose, and load-bearing: the vfox-shiv nested-install deadlock
+# (vfox-shiv#36) fires when a NEW release lands inside a floating range, so the
+# machine-level mitigation is the exact pin in ~/.config/mise/config.toml
+# ("shiv:shimmer" = "0.1.36"), which shadows this. Do not "fix" this line by
+# pinning it here and dropping the global pin — the global one is the guard.
 "shiv:shimmer" = "0.1"
 "shiv:websites" = "0.1"
 
