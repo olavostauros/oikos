@@ -43,6 +43,7 @@ yq = "4.53.6"
 "shiv:emails" = "0.7"
 "shiv:modules" = "0.9"
 "shiv:notes" = "0.10"
+"shiv:readme" = "0.3"
 "shiv:rudi" = "0.5"
 # Running from a local shiv install of knack's fork until the libsecret
 # provider lands upstream — see notes/agent-credentials.md. Restore this pin
