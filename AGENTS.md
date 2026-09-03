@@ -120,16 +120,67 @@ write them, or at minimum smoke-test manually and say what you verified.
 **Doc-check before you commit.** If you changed behavior, check whether a note in
 `notes/` needs updating.
 
-**Comments carry constraints, not narrative.** Owner-directed 2026-09-01. A
-code comment exists to tell the next editor something the code cannot — a
-non-obvious ordering, a block that must stay in sync, a named upstream
-workaround. The reproduction, the before/after and the issue number go in the
-commit message and the PR body, where a reader can follow them. **No decorative
-separators** — no `# =====` banners, no boxes, no ASCII rules; rikonor does not
-want them, and that holds even in files that already contain some. Leave
-existing ones alone; do not add more. Before committing, re-read your own added
-comment lines and delete every one a reviewer would already know from the PR
-body. knack's contract has the long form.
+**Comments carry constraints, not narrative.** Owner-directed 2026-09-01,
+**narrowed 2026-09-03: the ideal is no comments at all.** The narrowing is
+deliberate and is knick's to make — agents may tighten their own constraints at
+any time, and only the owner may loosen them — so a later improvement loop
+should not revert it as drift.
+
+**Start from zero and make each comment earn its place.** A comment is not the
+default state of a line. The reader already has the code, the commit message and
+the PR body; a comment has to beat all three. Try to make it unnecessary first —
+a better name, a smaller function, an earlier guard, a clearer control flow —
+and only when that genuinely fails should a comment survive.
+
+**The ideal is a target, not a prohibition.** Zero is what you aim at, not a
+count you enforce by deleting things that are holding a bug down. The test is
+mechanical: **delete the comment and ask whether a competent editor could now
+reintroduce a defect the comment was preventing.** If yes, it stays — it is
+carrying a constraint the code cannot express. If the answer is "the code
+already says this", it goes. A comment that survives that test is not a
+concession to the ideal; it is the reason the ideal is not a ban.
+
+Worked example, so the line is not theoretical: the three-line note in
+`lib/1password.sh` recording that a broadened match silently produces duplicate
+items **stays**. Deleting it invites the next editor to broaden the match again.
+Keeping it in the smallest form that still carries the warning is the correct
+call, and `3c1f939` making it shorter rather than removing it is the behaviour
+this rule wants.
+
+What does not survive, in rough order of how often it shows up:
+
+- **Restatement.** `# Read the existing value` above a line that reads the
+  existing value. If the comment is the code in English, delete the comment.
+- **Narration of structure.** `# Write under the new name`, `# Delete the old
+  entry` — a reader who can see three function calls does not need them named.
+- **Docblock ceremony that repeats the signature.** A `# Usage:` line that
+  restates the parameters the function already declares.
+- **History and provenance.** The reproduction, the before/after, the issue
+  number, what the code used to do. All of it belongs in the commit message and
+  the PR body, where a reader can follow the links.
+- **Decorative separators** — no `# =====` banners, no boxes, no ASCII rules;
+  rikonor does not want them, and that holds even in files that already contain
+  some. Leave existing ones alone; do not add more.
+
+Before committing, re-read your own added comment lines and delete every one
+that fails the deletion test. knack's contract has the long form.
+
+**This binds our repos. Upstream keeps its own house style.** `~/oikos` and the
+agent homes are ours and the ideal applies straight. A pull request into someone
+else's project is a different act: there, the governing rule is the one already
+stated above about separators — *rikonor does not want them* — which is
+deference to the maintainer's taste, not an assertion of ours. Match the file
+you are changing.
+
+**Where a new file is deliberately built to mirror an existing one, parity
+wins.** Measured 2026-09-03 on `KnickKnackLabs/secrets`: `lib/keychain.sh` is
+24% comment lines and the `lib/libsecret.sh` written to mirror it is 26%, with
+three of its comments verbatim identical to the sibling's. Stripping them would
+not be applying our style to a neutral file; it would make the new file the only
+provider in `lib/` without the conventions every other one has, and would break
+the parity the change is built on. If our ideal and an upstream file's own
+convention genuinely conflict, say so to the owner and let the maintainer's
+codebase win.
 
 **Cite a branch by its SHA.** In notes, contracts and queue entries, write a
 branch as `` `name` (`sha`) `` on first mention in an entry. Of the 24 topic
