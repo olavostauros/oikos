@@ -554,6 +554,38 @@ check in an earlier tool call is a fact about the past.
 under "Check `~/oikos` before you touch it". Read them there; they are not
 repeated here, because a duty restated in two places drifts in one of them.
 
+**A dirty working tree in `~/oikos` may not be yours.** Added 2026-09-03 after
+a near-miss: knick and knack independently reached for the *same stale
+paragraph* of this file within minutes, from opposite directions, and it only
+failed to become a conflict because knack's branch touched `notes/` alone.
+knack noticed the foreign edit, left it unstaged, merged around it and said so —
+that is the behaviour to copy.
+
+The existing rules cover an in-flight *operation* and a moving `main`. This is
+the third case: **someone else's uncommitted edit sitting in the tree you are
+about to write to.**
+
+- **Diff before you stage, and stage by path.** `git status --porcelain` and
+  `git diff --stat` first; then `git add <explicit paths>`, never `-A`, never
+  `.`, and never `notes commit --all` in a shared checkout. On 2026-09-03 a
+  `notes/` commit about test findings also carried two unrelated notes,
+  including a row added to an owner-only list, because the staging was broad
+  and the tree was not read first.
+- **An edit you did not make is not yours to commit, revert, or improve.** Leave
+  it, work around it if your paths do not overlap, and say in your report that
+  you saw it. If your paths *do* overlap, stop and hand it back rather than
+  resolving someone else's half-written change.
+- **Expect collisions on exactly the lines everyone just read.** Both agents
+  read the same reports, so the paragraph a report just falsified is the most
+  likely thing for two of them to correct at once. Before rewriting a rule
+  because a report called it stale, check whether the tree already contains
+  somebody's correction.
+- **`git status` does not see notes.** `notes/**` is filename-obfuscated and
+  carries `assume-unchanged`, so a pending note edit shows a clean `git status`.
+  Use `notes changes`, and where it matters compare the committed blob itself:
+  `git show HEAD:notes/<hash> | git-crypt smudge`. `notes changes` has its own
+  false-clean failure mode, so for anything load-bearing, read the blob.
+
 **A worktree is a measuring instrument, not a workspace.** Measured 2026-09-03:
 `knack/libsecret-provider`, the head of an open pull request, was checked out in
 a worktree under a **session-scoped** scratchpad directory, while the real clone
@@ -596,10 +628,14 @@ Access is a fact you measure, not a property you remember. This rule was
 written on 2026-09-03 from a real asymmetry — `knack-oikos` was not a
 collaborator on `olavostauros/oikos`, so knick pushed `main` with its own token
 while knack took a 403 on the identical command — and **it went stale the same
-day**: the owner invited knack with write (invitation `331618051`,
-2026-09-03T17:26:04Z), knack accepted, and all three of `olavostauros`,
-`knick-oikos` and `knack-oikos` now hold `push`. Verified by re-measuring, which
-is the point.
+day**. What is measured: all three of `olavostauros`, `knick-oikos` and
+`knack-oikos` now return `push: true`, the collaborator endpoint answers `204`
+for `knack-oikos`, and knack pushed `1dc5811..b3c9163` to `main` with its own
+token and no owner-credential transport. An invitation `331618051` was created
+at 2026-09-03T17:26:04Z; by the time anyone looked the invitation list was empty
+and the accept returned `404`, so **how it was accepted is not established** and
+is not recorded here as though it were. The permissions and the push are the
+evidence; the story is not.
 
 Keep the lesson and distrust the snapshot. A 403 is GitHub reporting a
 permission you do not have, not a credential fault, and no amount of
