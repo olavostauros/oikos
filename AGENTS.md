@@ -429,6 +429,16 @@ half-finished merge. Nothing warned either side.
   merge sits open across a turn.
 - **Park it back.** Leave the checkout on the branch you found it on — normally
   `main` — before you finish.
+- **Checking is not holding.** The checkout can move *between* your tool calls,
+  and it has: on 2026-09-03 two of knick's commits landed on knack's branch
+  because the tree was switched 22 seconds after knick's own check passed. So
+  verify the branch **in the same command** that commits (`git branch
+  --show-current` in a separate call is a fact about the past), keep
+  edit–commit–merge inside one chain, and **read the merge diffstat** — the file
+  count is a free assertion that you merged what you built.
+- **If a commit goes missing, take a ref before anything else.**
+  `git branch --contains <sha>` and the reflog will find it; `git branch <name>
+  <sha>` saves it. An unreferenced commit lives only as long as the reflog.
 
 **Clean up before you leave.** At the end of every session:
 - `git status` on every repo you touched — commit, push, or stash
