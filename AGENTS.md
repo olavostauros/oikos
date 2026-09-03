@@ -120,6 +120,37 @@ write them, or at minimum smoke-test manually and say what you verified.
 **Doc-check before you commit.** If you changed behavior, check whether a note in
 `notes/` needs updating.
 
+**Cite a branch by its SHA.** In notes, contracts and queue entries, write a
+branch as `` `name` (`sha`) `` on first mention in an entry. Of the 24 topic
+branches contained in `~/oikos`'s `main` on 2026-09-03, only 8 have a merge
+commit naming them — the other 16 landed as fast-forwards, so their names exist
+nowhere in history except the refs themselves. A citation that names only the
+branch stops being checkable the moment the ref goes away, and branch deletion is
+the owner's to run at any time. Names are borrowed; SHAs are not.
+
+**The convention is narrower than the pattern that matches it.** `<a>/<b>` in
+backticks matches far more than branches, and a mechanical pass over it does
+real damage. Do not add a SHA to:
+
+- **Remote-tracking refs and ranges** — `upstream/main`, `origin/main`,
+  `main..upstream/main`. They are moving pointers by definition; pinning one
+  states the opposite of what it means.
+- **Credential keys.** `owner/gpg-private-key`, `knick/github-pat`,
+  `oikos/git-crypt-key` and their siblings are vault entries that happen to share
+  the shape. A SHA on one is nonsense that reads as precision.
+- **Repositories.** `KnickKnackLabs/shiv`, `knack-oikos/secrets`,
+  `ricon-family/fold`.
+- **A branch in a fork or another repo.** Cite it by repo, and by its PR URL
+  where one exists — `` `knack-oikos/secrets` `knack/op-check-probe` `` plus the
+  link, which is what [[work-queue]]'s `branch:` field already does. Those
+  branches are rebased and force-pushed while under review, so a pinned SHA goes
+  stale silently, and the PR keeps its commit record even after the branch is
+  deleted on merge. The PR link is the durable citation there, not a SHA.
+
+Where a branch is genuinely gone, or lives in a repo whose history you cannot
+resolve, **say so in the citation** instead of inventing precision. A reference
+that looks checkable and is not is worse than a bare name.
+
 **Merge, don't squash.** Use `gh pr merge --merge` to preserve branch history.
 Keep branch commits clean before merging; the branch is the narrative.
 
