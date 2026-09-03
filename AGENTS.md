@@ -491,6 +491,116 @@ half-finished merge. Nothing warned either side.
   `git branch --contains <sha>` and the reflog will find it; `git branch <name>
   <sha>` saves it. An unreferenced commit lives only as long as the reflog.
 
+**Know which tree you are in, and prove it in the same command that writes.**
+A narrowing adopted 2026-09-03, written from this household's own failures
+rather than from general git advice. Nothing here is granted; every rule below
+tightens. The house has a documented habit of recording git beliefs it never
+tested, so each rule names the evidence that produced it.
+
+**Sourcing an identity moves you.** `~/.claude/oikos/activate.sh:29` ends with
+`cd "$home"`, where `home` is `$HOME/agents/<agent>/home` (line 18). So
+`cd <clone> && source activate.sh <agent> && git commit` stages in the agent
+home, not in the clone you just entered. **Source first, `cd` second, and never
+pipe the script** — piping authenticates you as the owner with his full scopes.
+Assert the destination in the same command that writes: `git -C <path>`, or
+`[ "$(git branch --show-current)" = "<branch>" ] && git commit …`. A branch
+check in an earlier tool call is a fact about the past.
+
+**`~/oikos` is one checkout shared by both agents.** The rules for it are above,
+under "Check `~/oikos` before you touch it". Read them there; they are not
+repeated here, because a duty restated in two places drifts in one of them.
+
+**A worktree is a measuring instrument, not a workspace.** Measured 2026-09-03:
+`knack/libsecret-provider`, the head of an open pull request, was checked out in
+a worktree under a **session-scoped** scratchpad directory, while the real clone
+sat parked on an unrelated local branch. The commits are safe — worktrees share
+the clone's object store and refs — but the directory is not, and the failure it
+produces is quiet:
+
+- **Check out a SHA, not a branch.** `git worktree add --detach <path> <sha>`.
+  A worktree holding a branch makes that branch un-checkoutable in the real
+  clone, so the tree you actually work in cannot reach your own work.
+- **Never put a worktree in session-scoped or temporary storage** when it holds
+  anything you intend to keep. Put it beside the clone.
+- **Remove it with `git worktree remove`, in the same chain that created it.**
+  `rm -rf` on the directory leaves the worktree registered and the branch still
+  locked; recovering needs `git worktree prune`, which nobody thinks to run
+  because nothing reports the problem.
+- **`git worktree list` before you conclude anything about a repo's state.** A
+  branch that will not check out, or a "detached HEAD" you did not ask for, is
+  usually a forgotten worktree rather than a broken repo.
+
+**Unpushed is invisible, and reviewers act on what is published.** Measured
+2026-09-03: `knack/claude-harness-wake` was **15 commits ahead of its own
+remote**, and those commits contained a merge of `upstream/main` and a fix
+pinning a tool — the two changes a review that same day recommended, unaware
+they already existed. Meanwhile the head of an open PR carried an unpushed
+owner-directed change on another branch.
+
+- **A commit that answers a review finding is not done until it is pushed.**
+  Report work as *pushed* or *unpushed*, never as "done"; "done" is what caused
+  a reviewer and an implementer to spend a session on the same two changes.
+- **Before asking anyone to look at a PR — a maintainer, a neighbour, the
+  owner — verify the branch is published:** `git rev-list --count @{u}..HEAD`
+  must be `0`, and the head SHA must match `gh pr view <n> --json headRefOid`.
+- **`@{u}..HEAD` is silent when there is no upstream.** A branch never pushed
+  has no `@{u}` and reports nothing rather than everything; `git branch -vv` and
+  a missing `[origin/…]` is the tell.
+
+**Push access is per-repository, and it is not symmetrical between us.**
+Measured 2026-09-03 against the collaborator list of `olavostauros/oikos`: the
+collaborators are `olavostauros` (admin) and `knick-oikos` (push). **`knack-oikos`
+is not a collaborator there at all**, which is why knick pushes `main` with its
+own token and knack receives a 403 on the identical command. That is GitHub
+behaving correctly, not a credential fault, and no amount of re-authenticating
+will change it.
+
+- **Do not diagnose a 403 as a broken token.** Check the permission first:
+  `gh api repos/<owner>/<repo> --jq .permissions`. One call settles it.
+- **The `env -u GH_TOKEN git push` transport publishes with the owner's
+  credentials.** Authorship stays the agent's; the push does not. It is
+  legitimate where an agent has no access, and it must be **named in the report
+  every time it is used**, because the repository's push record will say the
+  owner did something an agent did.
+- **Granting an agent push is the owner's act.** An agent may ask for a
+  collaborator invitation; it may not arrange one, and it may not route around
+  the absence of one by any other credential.
+
+**Notes are staged only by `notes commit`.** `notes/**` is git-crypt'd and
+filename-obfuscated, so `git add notes/<readable-name>` stages nothing useful
+and the pre-commit guard refuses it — correctly. Edit under readable names, then
+`notes commit -m '<message>' notes/<file>.md`, and confirm `notes status`
+reports clean afterwards.
+
+**A refused commit is the guard working; fix the cause, never the guard.**
+On 2026-09-03 `~/oikos` refused an agent's commit because the shell had no
+activated identity — the commit would have landed authored as the owner. The
+correct response was to activate and retry, which is what happened.
+`OIKOS_OWNER_COMMIT=1` is the human's escape hatch; **an agent setting it to get
+a commit through is disabling a guard to make a session pass, which the tiers
+forbid outright.**
+
+**Sign the commits that carry authority.** Measured 2026-09-03 across all 113
+commits on `~/oikos` `main`: 39 carry no signature — 37 authored by the owner
+and 2 by knack — and 6 more are signed by keys since revoked. The owner's
+current key (`231C8CA086C11258`) verifies from 2026-09-02 onward, so the
+capability is present and what remains is habit.
+
+This is not a rule that every commit must be signed, and it is not aimed at
+anyone. It is aimed at one specific class:
+
+- **A commit that grants, widens, or records authority should be signed** — the
+  contract, the permission tiers, the approved-recipient list, a widening. The
+  household's whole answer to relayed approval is *"the committed file is the
+  authorization; a relay is not."* That argument rests on the commit being
+  attributable, and today the commits recording the widenings
+  (`84739bf`, `25906c3`, `d8bd6d1`) are unsigned. The rule follows from the
+  household's own reasoning, not from anyone's preference.
+- **Six commits reading `R` are expected**, not damaged. They were signed with
+  keys the owner has since rotated away from, and their signatures were good
+  when made. Do not "repair" them: rewriting that history is owner-only, and
+  there is nothing there to fix.
+
 **Clean up before you leave.** At the end of every session:
 - `git status` on every repo you touched — commit, push, or stash
 - Check for unpushed commits
