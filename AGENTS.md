@@ -172,15 +172,33 @@ stated above about separators — *rikonor does not want them* — which is
 deference to the maintainer's taste, not an assertion of ours. Match the file
 you are changing.
 
-**Where a new file is deliberately built to mirror an existing one, parity
-wins.** Measured 2026-09-03 on `KnickKnackLabs/secrets`: `lib/keychain.sh` is
-24% comment lines and the `lib/libsecret.sh` written to mirror it is 26%, with
-three of its comments verbatim identical to the sibling's. Stripping them would
-not be applying our style to a neutral file; it would make the new file the only
-provider in `lib/` without the conventions every other one has, and would break
-the parity the change is built on. If our ideal and an upstream file's own
-convention genuinely conflict, say so to the owner and let the maintainer's
-codebase win.
+**Where a new file mirrors an existing one, say which parity you mean.**
+Recorded 2026-09-03, after knick argued this wrongly and the outcome corrected
+it. The case: `lib/libsecret.sh` in `KnickKnackLabs/secrets` was written to
+mirror `lib/keychain.sh`. knick measured comment density — 26% against the
+sibling's 24%, three comments verbatim identical — and argued that stripping
+them would break the parity the change was built on.
+
+The owner directed the strip with that measurement in front of him, and the
+result settled it: **functional parity survived, presentational parity did not,
+and the second mattered far less than the argument claimed.** The published head
+keeps the same seven functions in the same order under the same names and the
+same base64 wire format, and carries 11 comment lines in 162 where its sibling
+carries 43 in 176. Nothing broke. A mirror is a contract about behaviour, not
+about how the file reads.
+
+So: a sibling's *conventions* can be worth deferring to, and a sibling's
+*comment count* is not parity at all. Measure the thing that would actually
+break, and be able to say what it is before invoking the word.
+
+**The best answer to the deletion test is usually not a shorter comment.** That
+same file then went to zero comments by making its constraints executable — a
+predicate named for the condition it detects, stream captures named for why each
+stream is kept, and an injectable failure in the test mock so the path the
+comment warned about is reachable and covered by tests that fail when the guard
+is removed. That is strictly better than the comment it replaced: a comment asks
+the next editor to be careful, a failing test makes them. Reach for a name or a
+test first, and keep a comment only when neither can carry the constraint.
 
 **Cite a branch by its SHA.** In notes, contracts and queue entries, write a
 branch as `` `name` (`sha`) `` on first mention in an entry. Of the 24 topic
@@ -574,12 +592,19 @@ owner-directed change on another branch.
   a missing `[origin/…]` is the tell.
 
 **Push access is per-repository, and it is not symmetrical between us.**
-Measured 2026-09-03 against the collaborator list of `olavostauros/oikos`: the
-collaborators are `olavostauros` (admin) and `knick-oikos` (push). **`knack-oikos`
-is not a collaborator there at all**, which is why knick pushes `main` with its
-own token and knack receives a 403 on the identical command. That is GitHub
-behaving correctly, not a credential fault, and no amount of re-authenticating
-will change it.
+Access is a fact you measure, not a property you remember. This rule was
+written on 2026-09-03 from a real asymmetry — `knack-oikos` was not a
+collaborator on `olavostauros/oikos`, so knick pushed `main` with its own token
+while knack took a 403 on the identical command — and **it went stale the same
+day**: the owner invited knack with write (invitation `331618051`,
+2026-09-03T17:26:04Z), knack accepted, and all three of `olavostauros`,
+`knick-oikos` and `knack-oikos` now hold `push`. Verified by re-measuring, which
+is the point.
+
+Keep the lesson and distrust the snapshot. A 403 is GitHub reporting a
+permission you do not have, not a credential fault, and no amount of
+re-authenticating changes it — but who holds what changes without warning, in
+both directions, and a rule that names today's collaborators is wrong tomorrow.
 
 - **Do not diagnose a 403 as a broken token.** Check the permission first:
   `gh api repos/<owner>/<repo> --jq .permissions`. One call settles it.
@@ -590,7 +615,10 @@ will change it.
   owner did something an agent did.
 - **Granting an agent push is the owner's act.** An agent may ask for a
   collaborator invitation; it may not arrange one, and it may not route around
-  the absence of one by any other credential.
+  the absence of one by any other credential. When one is granted, the agent
+  that was blocked stops using the owner-credential transport — a workaround
+  kept past its cause is how a household ends up unable to say who pushed
+  what.
 
 **Notes are staged only by `notes commit`.** `notes/**` is git-crypt'd and
 filename-obfuscated, so `git add notes/<readable-name>` stages nothing useful
