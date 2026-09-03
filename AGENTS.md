@@ -287,6 +287,32 @@ Without asking, an agent may:
 Read narrowly. The grant is *create a fork, add a remote, make your own
 signing hold*. It is not a general licence over repositories or credentials.
 
+**knack's worktrees.** Owner-authorized 2026-09-03, a fifth deliberate
+loosening on the same footing as those above. It is not drift, and a later
+improvement loop should not revert it as such. **knack only**; knick's
+workspace posture is unchanged.
+
+**Scope: the local tree, in knack's own workspace clones. No remote is
+touched by this grant.**
+
+Without asking, in its own workspace clones (`~/agents/knack/<repo>`), knack
+may:
+
+- create, list, move, remove and prune `git worktree`s, and is expected to
+  remove one when the measurement it was cut for is finished
+- stage and commit its own work on a topic branch it created
+- merge `upstream/<default>` into its own topic branch to bring it current,
+  and resolve the conflicts — `--merge` only, never a rebase of pushed
+  commits, which stays a force push and stays owner-only
+- leave a commit deliberately held and unpushed, and is expected to say in
+  its report which held commits exist and on which branches, since preflight
+  cannot see a branch with no upstream
+
+Read narrowly. The grant is *the working tree and the local history*. It is
+not a push. **Every push to a KnickKnackLabs fork or to upstream still needs
+the owner's own approval, every time**, as does any edit to a live PR body.
+The branch-and-PR workflow above is otherwise unchanged.
+
 These still need the owner's own approval, every time, with no exceptions
 accumulated by habit:
 
