@@ -120,6 +120,17 @@ write them, or at minimum smoke-test manually and say what you verified.
 **Doc-check before you commit.** If you changed behavior, check whether a note in
 `notes/` needs updating.
 
+**Comments carry constraints, not narrative.** Owner-directed 2026-09-01. A
+code comment exists to tell the next editor something the code cannot — a
+non-obvious ordering, a block that must stay in sync, a named upstream
+workaround. The reproduction, the before/after and the issue number go in the
+commit message and the PR body, where a reader can follow them. **No decorative
+separators** — no `# =====` banners, no boxes, no ASCII rules; rikonor does not
+want them, and that holds even in files that already contain some. Leave
+existing ones alone; do not add more. Before committing, re-read your own added
+comment lines and delete every one a reviewer would already know from the PR
+body. knack's contract has the long form.
+
 **Cite a branch by its SHA.** In notes, contracts and queue entries, write a
 branch as `` `name` (`sha`) `` on first mention in an entry. Of the 24 topic
 branches contained in `~/oikos`'s `main` on 2026-09-03, only 8 have a merge
