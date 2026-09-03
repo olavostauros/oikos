@@ -409,6 +409,27 @@ without warning, and unwritten context is lost.
 **Shared spaces are shared.** `notes/` is common ground. Coordinate overlapping
 changes rather than assuming ownership from a quiet checkout.
 
+**Check `~/oikos` before you touch it — a git operation may be in flight.** A
+narrowing, adopted 2026-09-03 after a live near-miss: knack found `.git/MERGE_HEAD`
+present and `UU AGENTS.md` in the shared checkout while another party's merge sat
+resolved but uncommitted. `git switch`, `git add`, `git commit` or
+`git merge --abort` at that moment would have landed inside someone else's
+half-finished merge. Nothing warned either side.
+
+- **Look first.** Before switching, staging, committing or merging in `~/oikos`:
+  `ls .git/MERGE_HEAD .git/REBASE_HEAD .git/CHERRY_PICK_HEAD 2>/dev/null` and
+  `git status --porcelain`. If an operation is in progress, it is not yours —
+  wait for it. Do not abort it, do not commit it, do not switch away from it.
+- **`HEAD` does not tell you whose merge it is.** In the near-miss, `HEAD` was at
+  `3c6aff1`, knick's last completed merge, so the tree read as knick's. The merge
+  actually in flight was the owner's (`a089d02`). The last commit is the author of
+  the last *finished* operation, and says nothing about the one still open.
+- **Finish your own merge in one go.** Resolve, commit, and leave the tree clean
+  within the same chain of commands. The dangerous window exists only while a
+  merge sits open across a turn.
+- **Park it back.** Leave the checkout on the branch you found it on — normally
+  `main` — before you finish.
+
 **Clean up before you leave.** At the end of every session:
 - `git status` on every repo you touched — commit, push, or stash
 - Check for unpushed commits
