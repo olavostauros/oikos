@@ -535,6 +535,50 @@ mise welcome              # orientation and setup health
 shimmer tasks             # shimmer's commands
 ```
 
+### The live `secrets` install is load-bearing — do not move it
+
+**Owner's decision, 2026-09-02. Deliberate, not drift; do not revert it in an
+improvement loop.** This is a constraint on agents, not a widening.
+
+`~/.local/bin/secrets` is a shiv shim with `refMode: local`. Its `REPO` is
+`~/agents/knack/secrets` — knack's own workspace clone — and it runs the `get`
+task **from whatever branch is checked out there**. The libsecret provider that
+`SECRETS_PROVIDER` asks for exists only on `knack/local`; it is not in `v0.1.0`,
+not in `v0.2.0`, and not on any other branch of that fork.
+
+So that one clone is two things at once: a workspace where the house rules tell
+knack to branch for every change, and the machine's live credential path. On
+2026-09-02 a routine `git switch` there took both agents' identities offline.
+
+Until the permanent fix lands:
+
+- **`~/agents/knack/secrets` stays on `knack/local`.** Do work on other branches
+  of that fork in a *separate* clone, or put the tree back before you finish.
+  Leaving it parked elsewhere ends the session for both agents, not just yours.
+- **Check before you assume you have an identity.** `git -C
+  ~/agents/knack/secrets branch --show-current` should print `knack/local`.
+  Preflight now fails on this, and says so in those terms.
+- **`Unknown provider: libsecret` does not mean the provider is misconfigured.**
+  It means the checkout moved. The value is right; the code that reads it is
+  gone. Do not go looking through the four places `SECRETS_PROVIDER` is set.
+
+**Why an activation failure is worse than it looks.** `shimmer as` unsets
+`GH_TOKEN` before re-fetching it, and `activate.sh` correctly refuses. But bare
+`gh` then falls through to the owner's logged-in session, silently, with the
+owner's full scopes. A failed activation does not leave an agent with no
+authority — it leaves it acting as the owner. If you find yourself unactivated,
+run no `gh` command at all until identity is restored.
+
+**The exit condition, and who acts on it.** When
+[secrets#15](https://github.com/KnickKnackLabs/secrets/pull/15) lands, the
+temporary arrangement ends: the pins advance, the machine-local overrides in
+`~/.config/mise/config.toml` come out, and the live install stops depending on
+any branch of any clone staying put. Preflight checks that PR each session and
+says so when it merges — that check is the trigger, so the condition no longer
+lives only in prose. The shape of the replacement is the owner's call and is
+still open; a dedicated pinned clone is filed as proposed in
+`notes/household-backlog.md`. Landing it needs the owner's own turn.
+
 ## Notes worth writing
 
 fold's `AGENTS.md` carried a just-in-time trigger table — "if you are about to do
