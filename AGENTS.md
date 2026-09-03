@@ -6,12 +6,6 @@ after working in the world.
 This repo is derived from [ricon-family/fold](https://github.com/ricon-family/fold).
 The machinery is theirs; the household is yours.
 
-## Status
-
-**Bootstrapping.** The task machinery works, but the household is empty: no agent
-identities, no notes, no scheduled workflows. See "Setting up the household" below
-for what has to exist before an agent can wake here.
-
 ## Purpose
 
 oikos is where agents:
@@ -30,27 +24,18 @@ Agents have **two** homes, and the split matters:
 
 | | oikos (this repo) | Private home repo |
 |---|---|---|
-| Location | `~/agents/<name>/home/modules/oikos/` | `~/agents/<name>/home/` |
+| Location | `~/oikos` — one checkout, shared | `~/agents/<name>/home/` |
 | Visible to | the owner and every agent with repo access | only that agent and the owner |
 | Holds | shared notes, identity files, collaboration | canonical `AGENTS.md`, session logs, private memory |
 
-**Each agent works in their own module checkout** at
-`~/agents/<name>/home/modules/oikos/`. Multiple agents can work concurrently
-without conflicting because each has a separate clone.
+**`~/oikos` is a single shared checkout, not a per-agent clone.** Switching its
+branch moves it for every agent at once. The per-agent
+`~/agents/<name>/home/modules/oikos/` layout this section used to describe was
+never built; see "Shared notes" for the rules that shared state actually needs.
 
-**Home repos are not global commands.** oikos is a home repo, the same way
-`~/agents/<name>/home` is. Orient by `cd`-ing into the module checkout and running
-`mise welcome`. Treat shiv-installed *tools* (`~/.local/share/shiv/packages/*` —
-`shimmer`, `notes`, `modules`, `chat`) as read-only: edit those in their own
-working clone, push, then `shiv update <pkg>`.
-
-### Why separate clones, not one shared checkout
-
-- **GPG signing:** `shimmer gpg:setup` configures signing for repos under
-  `~/agents/<name>/`. A clone outside that scope produces unsigned commits.
-- **Concurrency:** multiple agents editing one working tree causes conflicts.
-- **Clean state:** each agent's clone is theirs. No detective work about who left
-  uncommitted changes.
+Treat shiv-installed *tools* (`~/.local/share/shiv/packages/*` — `shimmer`,
+`notes`, `modules`, `chat`) as read-only: edit those in their own working clone,
+push, then `shiv update <pkg>`.
 
 ## Who are you?
 
@@ -266,6 +251,59 @@ little work.
 Household repos (`~/oikos`, your home repo) are exempt from the fresh-cut
 requirement — they are a shared trunk, not a review queue — but the "one
 reviewable idea" habit still applies there.
+
+### The loosenings — canonical list
+
+<a id="the-loosenings"></a>
+
+**Agents may narrow their own constraints at any time. Only the owner widens
+them.** Five widenings have been granted. Each is deliberate, dated, and is not
+drift a later improvement loop should revert.
+
+| # | Date | Grant | Applies to |
+|---|---|---|---|
+| 1 | 2026-08-31 | routine commits and pushes in `~/oikos` and the agent's own home | both |
+| 2 | 2026-09-01 | merging own topic branches to `main` in those two repos | both |
+| 3 | 2026-09-01 | forking a public KnickKnackLabs repo, adding it as a remote; making the agent's *own* signing persist | both |
+| 4 | 2026-09-01 | read-only posture lifted for *speech* upstream — comments, reviews, arguing a position, requesting a closure | **knick only** |
+| 5 | 2026-09-03 | `git worktree` and local history in the agent's own workspace clones | **knack only** |
+
+Each row's full scope is the clause below it in this file; the clause governs,
+the table only indexes. **This table is the only place the list is enumerated.**
+Nothing outside this file — no agent definition, no home `AGENTS.md`, no
+identity note, no coordinator `CLAUDE.md` — may restate or count them. Twice a
+granted widening sat unnoticed because a satellite copy said "three" and nobody
+reads the same rule twice. Link here instead.
+
+### The contract is authority-only
+
+**Owner's decision, 2026-09-03. Deliberate, not drift; do not revert it in an
+improvement loop.** This authorizes work: it is the standing instruction for the
+restructure described below, and no relay is needed to act on it.
+
+A two-agent session costs roughly 83,000 tokens before either agent does any
+work, and this file — loaded whole, by both agents, every time — is the largest
+single line item. Most of it is not authority. It is practice: worked examples,
+procedures, and the reasoning behind rules that are themselves one line.
+
+**This file holds authority only** — the tiers, the loosenings, the git rules,
+shared-notes and shared-checkout hygiene, and the owner-only list. *Practice*
+moves out, into notes read at the moment they apply and wired to the `Read
+first` table. What moves is the example, never the rule: the rule stays here in
+the form an agent can act on without the example.
+
+Authority does not split. The tiers, the loosenings, and the refusal to accept
+relayed approval stay in this file, whole and in one place, whatever their
+length. Splitting authority is how two granted widenings failed to reach the
+agents who had been given them.
+
+**knick is authorized to perform the relocation** — moving practice out of this
+file into trigger-read notes, deleting text this file duplicates from elsewhere,
+and archiving finished work out of the queue — and to commit and push it under
+loosenings 1 and 2. It may not touch the tiers, the loosenings table, the
+owner-only list, or this section. Where it judges that a passage's *length is
+what makes it work*, it keeps the passage and says so; the reduction is not a
+target to hit.
 
 **Routine commits and pushes in household repos.** Owner-authorized 2026-08-31.
 This is a deliberate loosening, granted by the owner; it is not drift, and a
@@ -798,66 +836,6 @@ cd <repo-name>
 Use `gh repo clone`, not `git clone` — private repos need auth, and `gh` handles it
 (especially in CI, where git credentials aren't configured).
 
-## Setting up the household
-
-Nothing here works until these exist. In order:
-
-1. **git-crypt + a GPG key.** `notes/` is encrypted; without a key you cannot read
-   or write it. `rudi install` fetches git-crypt; generate a GPG key, then
-   `notes setup --gpg-key <fingerprint>` initializes an encrypted corpus of your
-   own. (`rudi init` is the lower-level equivalent if you want named keys.)
-2. **An owner identity.** Decide what agents call you, and replace "the owner"
-   through this file.
-3. **At least one agent.** `shimmer agent:onboard <name>` is the interactive path;
-   `shimmer agent:provision` handles credentials, GPG key, and GitHub secrets. It
-   produces a home repo at `~/agents/<name>/home/` with its own root `AGENTS.md`.
-   Then write `notes/<name>.md` here as the shared identity file.
-4. **Email + GitHub credentials**, if you want agents to communicate or run in CI.
-   Set `OIKOS_EMAIL_DOMAIN` and `OIKOS_MAIL_HOST` to your own mail service —
-   they default to the placeholder `oikos.local`, which does not resolve.
-5. **Workflows.** Add entries to `workflows.yaml` and run
-   `shimmer workflows:generate`.
-
-### First-time setup of a home
-
-```bash
-cd ~/agents/<name>/home/
-git status --short --branch
-mise trust
-mise install
-mise run agent:prepare
-```
-
-`agent:prepare` is the home's own preparation hook. It must be idempotent and safe
-before every headless session — `notes unlock`, `notes install-hooks`, selected
-`modules init`, cache warming. The home declares which tools it calls; oikos
-launchers must not hardcode assumptions about notes, modules, or other optional
-systems.
-
-### Daily workflow
-
-1. **Inspect before refreshing** — check branch, worktree, upstream, and note state
-   before running anything that changes them. Fetch only when freshness matters.
-   Don't switch an intentional topic branch to main, and don't run `modules update`
-   without an intentional pin advance.
-2. **Edit** in `~/agents/<name>/home/modules/oikos/`
-3. **Commit and push** — commits are GPG-signed automatically under `~/agents/<name>/`
-4. Other agents see your changes when they next pull their own checkout.
-
-## Cross-home modules
-
-oikos and other home repos can reference each other through encrypted module
-manifests. After unlocking:
-
-```bash
-notes unlock            # decrypt notes in this repo
-modules unlock          # decrypt .modules/manifest
-modules init <name>     # prepare one inspected, lane-relevant module
-```
-
-Do not initialize every nested module as orientation ritual. No modules are
-declared yet — `.modules/config` exists, but the manifest does not.
-
 ## Communication
 
 - **Owner ↔ agents:** in the session. Not through GitHub comments or mail —
@@ -929,26 +907,10 @@ still open; a dedicated pinned clone is filed as proposed in
 
 ## Notes worth writing
 
-fold's `AGENTS.md` carried a just-in-time trigger table — "if you are about to do
-X, first read `notes/<topic>.md`" — backed by a large shared corpus. That corpus
-was encrypted and did not come across, so the table would be dead links.
-
-The mechanism is worth rebuilding as you accumulate hard-won lessons.
-Highest-value topics, roughly in the order they tend to bite:
-
-- `mise-conventions.md` / `mise-gotchas.md` — before writing or changing tasks
-- `bats-tool-testing.md` — before writing tests
-- `observed-failures-are-work.md` — what to do when a command fails
-- `code-review.md` — review standards, including "reviews ship with fixes"
-- `agent-dispatching.md` — which model to wake an agent with, and how
-- `local-agent-wakes.md` — spawning workers and continuing sessions
-- `orientation.md` — the shared startup protocol this file gestures at
-- `notes-managed-repo-workflow.md` — staging and committing encrypted notes
-- `github-actions-ci.md` — CI auth, secrets, and PAT rotation
-
-When you add one, add its trigger back to the table below. Guidance only works
-when it appears at the moment you need it — a startup reading list is not the
-same thing.
+Write a note when you learn something that cost you time and will cost the next
+agent the same. A note earns its place by being read at the moment it applies,
+not by existing: **when you add one, add its trigger to the table below.** A
+startup reading list is not the same thing, and is how a corpus turns into a tax.
 
 ### Read first
 
