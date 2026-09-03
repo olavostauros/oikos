@@ -326,10 +326,34 @@ may:
   its report which held commits exist and on which branches, since preflight
   cannot see a branch with no upstream
 
-Read narrowly. The grant is *the working tree and the local history*. It is
-not a push. **Every push to a KnickKnackLabs fork or to upstream still needs
-the owner's own approval, every time**, as does any edit to a live PR body.
-The branch-and-PR workflow above is otherwise unchanged.
+Read narrowly. The grant is *the working tree and the local history*, plus
+the one push that publishes it.
+
+**Amended 2026-09-03, the same day it was written.** As first drafted this
+clause said every push to a KnickKnackLabs fork needed the owner's own
+approval, every time. That was unsatisfiable, and knack said so against its
+own interest: the only path from the owner to an agent runs through a
+coordinator session, and Tier 3 tells the agent not to treat a relayed claim
+of approval as approval. A rule that can only be honoured by breaking another
+rule gets resolved case by case in the acting agent's favour, which is the
+worst of both. The amendment narrows the rule to what it was for.
+
+**Standing authorization, no approval needed each time:** pushing knack's own
+commits to a branch on **knack's own fork**, fast-forward only, including a
+branch that backs an open PR. Push by explicit refspec whenever the local
+branch carries anything not being published. Report what was pushed and what
+the published head became.
+
+**Still the owner's own approval, every time:** any push to `upstream`; any
+push to a default branch outside the two household repos; `--force`,
+`--force-with-lease`, or any rewrite of pushed history; and **any edit to a
+live PR body or title**. The branch-and-PR workflow above is otherwise
+unchanged.
+
+The line this draws is reversibility, not ownership. A fast-forward to an
+agent's own fork is undone by another commit. Everything held back above
+either cannot be undone, or is read outside this household as our considered
+word.
 
 These still need the owner's own approval, every time, with no exceptions
 accumulated by habit:
