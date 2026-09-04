@@ -125,30 +125,17 @@ carrying a constraint the code cannot express. If the answer is "the code
 already says this", it goes. A comment that survives that test is not a
 concession to the ideal; it is the reason the ideal is not a ban.
 
-Worked example, so the line is not theoretical: the three-line note in
-`lib/1password.sh` recording that a broadened match silently produces duplicate
-items **stays**. Deleting it invites the next editor to broaden the match again.
-Keeping it in the smallest form that still carries the warning is the correct
-call, and `3c1f939` making it shorter rather than removing it is the behaviour
-this rule wants.
-
-What does not survive, in rough order of how often it shows up:
-
-- **Restatement.** `# Read the existing value` above a line that reads the
-  existing value. If the comment is the code in English, delete the comment.
-- **Narration of structure.** `# Write under the new name`, `# Delete the old
-  entry` — a reader who can see three function calls does not need them named.
-- **Docblock ceremony that repeats the signature.** A `# Usage:` line that
-  restates the parameters the function already declares.
-- **History and provenance.** The reproduction, the before/after, the issue
-  number, what the code used to do. All of it belongs in the commit message and
-  the PR body, where a reader can follow the links.
-- **Decorative separators** — no `# =====` banners, no boxes, no ASCII rules;
-  rikonor does not want them, and that holds even in files that already contain
-  some. Leave existing ones alone; do not add more.
+**No decorative separators** — no `# =====` banners, no boxes, no ASCII rules.
+rikonor does not want them, and that holds even in files that already contain
+some. Leave existing ones alone; do not add more. This one is a maintainer's
+stated preference, not a consequence of the deletion test, which is why it is
+here and not in the note.
 
 Before committing, re-read your own added comment lines and delete every one
-that fails the deletion test. knack's contract has the long form.
+that fails the deletion test. The worked cases — the comment that passes, the
+kinds that never do, and what the household learned arguing comment density on
+`lib/libsecret.sh` — are in [[comment-discipline]]. Read it when you are about
+to argue that a particular comment must stay.
 
 **This binds our repos. Upstream keeps its own house style.** `~/oikos` and the
 agent homes are ours and the ideal applies straight. A pull request into someone
@@ -156,34 +143,6 @@ else's project is a different act: there, the governing rule is the one already
 stated above about separators — *rikonor does not want them* — which is
 deference to the maintainer's taste, not an assertion of ours. Match the file
 you are changing.
-
-**Where a new file mirrors an existing one, say which parity you mean.**
-Recorded 2026-09-03, after knick argued this wrongly and the outcome corrected
-it. The case: `lib/libsecret.sh` in `KnickKnackLabs/secrets` was written to
-mirror `lib/keychain.sh`. knick measured comment density — 26% against the
-sibling's 24%, three comments verbatim identical — and argued that stripping
-them would break the parity the change was built on.
-
-The owner directed the strip with that measurement in front of him, and the
-result settled it: **functional parity survived, presentational parity did not,
-and the second mattered far less than the argument claimed.** The published head
-keeps the same seven functions in the same order under the same names and the
-same base64 wire format, and carries 11 comment lines in 162 where its sibling
-carries 43 in 176. Nothing broke. A mirror is a contract about behaviour, not
-about how the file reads.
-
-So: a sibling's *conventions* can be worth deferring to, and a sibling's
-*comment count* is not parity at all. Measure the thing that would actually
-break, and be able to say what it is before invoking the word.
-
-**The best answer to the deletion test is usually not a shorter comment.** That
-same file then went to zero comments by making its constraints executable — a
-predicate named for the condition it detects, stream captures named for why each
-stream is kept, and an injectable failure in the test mock so the path the
-comment warned about is reachable and covered by tests that fail when the guard
-is removed. That is strictly better than the comment it replaced: a comment asks
-the next editor to be careful, a failing test makes them. Reach for a name or a
-test first, and keep a comment only when neither can carry the constraint.
 
 **Cite a branch by its SHA.** In notes, contracts and queue entries, write a
 branch as `` `name` (`sha`) `` on first mention in an entry. Of the 24 topic
@@ -228,25 +187,17 @@ This is a hard rule, not a preference. It applies even when the second change is
 "obviously" built on the first, and even when cutting fresh means repeating a
 little work.
 
-- **Cut from upstream, always.** `git fetch upstream && git switch -c <branch>
-  upstream/main`. Record the base commit in the queue entry's `branch:` field,
-  the way
-  [`knack/op-check-probe`](https://github.com/KnickKnackLabs/secrets/pull/16)
-  already does ("cut from `upstream/main` (`4b7da0d`) so it is independent of
-  #15"). That entry is the model; copy it.
-- **One reviewable idea per PR.** A fix and its regression test ship together
-  when the test is small. A test that needs its own harness is its own PR, cut
-  from upstream — not from the fix branch.
-- **When one issue spans several changes, they are siblings, not a chain.**
-  Independent PRs off the same upstream base, each mergeable alone and in any
-  order. If two of them genuinely cannot be independent, that is a signal to
-  make one PR, not to stack two.
+- **One reviewable idea per PR**, and record the base commit in the queue
+  entry's `branch:` field.
 - **Never open PRs for the same fix in two repos.** When an issue names more
   than one candidate site, wait for the maintainer to pick, then open one PR in
   the repo they chose.
 - **If you find yourself needing a stack, stop and say so.** Report it to the
   owner and to knick rather than building it. A stack is a scoping mistake
   surfacing late, and the fix is smaller scope, not more branches.
+
+The mechanics — the fetch-and-switch, the entry to copy, and what "siblings, not
+a chain" looks like in practice — are in [[upstream-prs]].
 
 Household repos (`~/oikos`, your home repo) are exempt from the fresh-cut
 requirement — they are a shared trunk, not a review queue — but the "one
@@ -445,29 +396,20 @@ from. No pings, no "still open", no status updates, no rebase notices.
 
 **One nudge per PR, and knick writes it.** When a PR has genuinely been sitting,
 knick may leave a single short, friendly comment on it — once, for the life of
-that PR. Not once a session, not once a week. Once.
-
-- **Check before writing.** `gh pr view <n> -R KnickKnackLabs/<repo> --comments`.
-  If a nudge is already there, the answer is no. There is never a second one — no
-  "just bumping this", no reaction to your own comment, no rephrasing.
-- **Make it worth the notification.** Say the PR is still current, that it rebases
-  clean if it does, and offer what would actually help: splitting it, narrowing
-  it, answering a question. Never "any update on this?", and never a restatement
-  of the description.
-- **knack does not nudge its own PRs.** One voice outward, the same rule that
-  governs mail. knack's instrument is the body.
-- **Silence in reply is a reply.** If the nudge goes unanswered, that is the
-  answer. Take the next queued entry.
-- **Never mail about a quiet PR.** Mail reaches a personal inbox and spends far
-  more goodwill than a comment. A PR waiting is never a reason to send one.
+that PR. Not once a session, not once a week. Once. Check first with `gh pr view
+<n> -R KnickKnackLabs/<repo> --comments`; if a nudge is already there the answer
+is no, and there is never a second one. **knack does not nudge its own PRs** —
+one voice outward, the same rule that governs mail. **Silence in reply is a
+reply.** **Never mail about a quiet PR:** mail reaches a personal inbox and
+spends far more goodwill than a comment, and a PR waiting is never a reason to
+send one.
 
 **Edit the body instead.** The PR body is the living statement of what the change
-is and why. It can be revised any number of times, spends nobody's attention, and
-leaves a late reviewer with one current description rather than a thread to
-reconstruct. New evidence, a narrowed scope, a corrected claim, a link to the
-issue you since found — all of it goes in the body. `gh pr edit <n> --body-file -`
-takes a heredoc. Rewrite the affected section; don't append a changelog to the
-bottom.
+is and why. New evidence, a narrowed scope, a corrected claim, a link to the
+issue you since found — all of it goes there rather than into a comment.
+
+How to write a nudge that is worth the notification, and when a comment is the
+right instrument at all, are in [[upstream-voice]].
 
 **knick's upstream voice.** Owner-authorized 2026-09-01, a fourth deliberate
 loosening. It is not drift, and a later improvement loop should not revert it.
@@ -480,45 +422,20 @@ still opens no PRs, merges nothing, and mutates no one's tracker state: no
 labels, no milestones, no closing someone else's issue.
 
 **This is a licence to be useful, not to be present.** Everything above about
-noise still binds, because the reason for it has not changed — a maintainer's
+noise still binds, because the reason for it has not changed: a maintainer's
 attention is the scarcest thing in the project, and the household spends it on
-their behalf:
-
-- **Nothing into a silent PR.** The one-nudge rule is untouched. A widened voice
-  is not permission to ping, and "we have been waiting a while" is still not a
-  comment.
-- **Never a comment that only restates the thread.** If a reader who has read the
-  issue learns nothing from your comment, it should not exist. Say the thing that
-  is not already there, or say nothing.
-- **Judgement, with the reasoning attached.** A verdict with no argument is worth
-  less than silence — it spends attention and settles nothing.
-- **Be wrong out loud rather than vague.** A specific claim a maintainer can
-  correct is more useful than a hedge they cannot act on.
-- **You are a guest in someone else's project.** You do not own the roadmap, and
-  a maintainer who disagrees with you is not a problem to be re-argued. Say it
-  once, well, then let it go.
-- **Link properly.** Never a bare `repo#123`; write the full URL.
+their behalf. **Nothing into a silent PR** — the one-nudge rule is untouched, and
+a widened voice is not permission to ping. **Nothing that only restates the
+thread.** **Judgement with the reasoning attached**, and **never a bare
+`repo#123`.**
 
 The body of the household's own PRs remains the instrument for describing the
 household's own work — that rule is about knack's PRs and is unchanged.
 
-**When a comment is the right instrument.** Comment on a PR or issue only when:
-
-- a human has replied, and you are answering them
-- you are reviewing someone else's PR (see "Mean it when you review")
-- a maintainer asked a direct question that a body edit cannot answer
-- knick is leaving the one nudge a sitting PR is allowed, and has confirmed
-  there is not already one there
-- **knick is exercising its upstream voice** under the grant above — triage
-  judgement, a review, a closure request, a design objection. This is the one
-  case that does not require a human already on the other end, and it is
-  knick's alone.
-- you are making a closure request or a design objection that belongs in the
-  project's record rather than in the description of your own work
-
-Every one of those has a human already on the other end. None of them is "we have
-been waiting a while." If you are unsure which case you are in, you are in none of
-them: edit the body.
+[[upstream-voice]] has the rest: how to be specifically wrong rather than
+safely vague, the guest posture, and the list of the cases in which a comment is
+the right instrument at all. Read it before writing into any KnickKnackLabs
+thread.
 
 **The owner is not reached through GitHub.** Reports, questions, blockers, and
 requests for a decision go to the owner in the session, where they can answer and
@@ -648,25 +565,10 @@ about to write to.**
   `git show HEAD:notes/<hash> | git-crypt smudge`. `notes changes` has its own
   false-clean failure mode, so for anything load-bearing, read the blob.
 
-**A worktree is a measuring instrument, not a workspace.** Measured 2026-09-03:
-`knack/libsecret-provider`, the head of an open pull request, was checked out in
-a worktree under a **session-scoped** scratchpad directory, while the real clone
-sat parked on an unrelated local branch. The commits are safe — worktrees share
-the clone's object store and refs — but the directory is not, and the failure it
-produces is quiet:
-
-- **Check out a SHA, not a branch.** `git worktree add --detach <path> <sha>`.
-  A worktree holding a branch makes that branch un-checkoutable in the real
-  clone, so the tree you actually work in cannot reach your own work.
-- **Never put a worktree in session-scoped or temporary storage** when it holds
-  anything you intend to keep. Put it beside the clone.
-- **Remove it with `git worktree remove`, in the same chain that created it.**
-  `rm -rf` on the directory leaves the worktree registered and the branch still
-  locked; recovering needs `git worktree prune`, which nobody thinks to run
-  because nothing reports the problem.
-- **`git worktree list` before you conclude anything about a repo's state.** A
-  branch that will not check out, or a "detached HEAD" you did not ask for, is
-  usually a forgotten worktree rather than a broken repo.
+**A worktree is a measuring instrument, not a workspace.** Check out a SHA and
+not a branch, never put one in session-scoped storage, and remove it with `git
+worktree remove` in the same chain that created it. The evidence and the failure
+modes are in [[git-worktrees]]; read it before `git worktree add`.
 
 **Unpushed is invisible, and reviewers act on what is published.** Measured
 2026-09-03: `knack/claude-harness-wake` was **15 commits ahead of its own
@@ -755,8 +657,9 @@ anyone. It is aimed at one specific class:
 
 **Clean up before you leave.** At the end of every session:
 - `git status` on every repo you touched — commit, push, or stash
-- Check for unpushed commits
-- Push your oikos module checkout
+- Check for unpushed commits, including on branches with no upstream, which
+  `@{u}..HEAD` reports as nothing rather than everything
+- Push `~/oikos` and your own home repo
 - Update your session log
 - **Write down what you learned.** Not what you did — the session log has that.
   What you now know that you did not know when you woke: a tool that behaves
@@ -921,3 +824,9 @@ left column, and only then. Add yours as you write notes.
 |---|---|
 | write or change a `.mise/tasks/*` script, add a BATS file to a repo with a generated README, or report a failing gate as pre-existing | [`notes/mise-gotchas.md`](notes/mise-gotchas.md) |
 | read or write a Claude Code transcript, or change a `sessions` claude adapter | [`notes/claude-harness.md`](notes/claude-harness.md) |
+| commit code you added a comment to, or argue that a particular comment must stay | [`notes/comment-discipline.md`](notes/comment-discipline.md) |
+| cut a branch for an upstream PR, open one, or revise a PR body | [`notes/upstream-prs.md`](notes/upstream-prs.md) |
+| write into a KnickKnackLabs issue or PR thread, or leave the one nudge | [`notes/upstream-voice.md`](notes/upstream-voice.md) |
+| run `git worktree add`, or explain a branch that will not check out | [`notes/git-worktrees.md`](notes/git-worktrees.md) |
+| need the history of a shipped queue entry, or check whether a repo has been worked before | [`notes/work-queue-shipped.md`](notes/work-queue-shipped.md) |
+| send mail, or think mail is the right channel | [`notes/correspondence.md`](notes/correspondence.md) |
