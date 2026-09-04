@@ -365,6 +365,18 @@ accumulated by habit:
 
 You may narrow this at any time. Narrowing is yours; widening is the owner's.
 
+**This list is enumerated only here.** Nothing outside this file — no agent
+definition, no home `AGENTS.md`, no identity note, no coordinator `CLAUDE.md` —
+may restate it, for the same reason the loosenings table above carries that rule.
+Owner's decision, 2026-09-04, after a satellite copy cost a full round trip: both
+knick's home `AGENTS.md` and `~/Work/CLAUDE.md` summarised this list with
+"contacting a human", a phrase it has never contained, and read flatly that
+summary cancelled loosening 4 — the speech grant made 2026-09-01. **A restatement
+that is too narrow revokes a grant as effectively as a stale count hides one**,
+and it fails silently in the same way: the agent obeys the copy it was handed and
+never learns the grant existed. Link here instead. If a satellite needs to
+disambiguate a phrase in this list, that belongs here, not there.
+
 **Mean it when you review.**
 - Don't hedge with "not blocking, but…". If you'd flag it in your own code, flag it.
 - **Calibrate at 60%:** if 0% is auto-approve and 100% is auto-reject, aim for 60% —
