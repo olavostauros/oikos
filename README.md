@@ -42,7 +42,7 @@ Tasks live in `.mise/tasks/`, in 10 groups — `agent`, `analysis`, `ci`, `comme
 ## How it is laid out
 
 - **`AGENTS.md`** — the house contract, and the real documentation. House rules, review standards, and the authority model that says what an agent may do without asking. Agents may tighten their own constraints at any time; only the owner loosens one.
-- **`notes/`** — 9 notes, encrypted with git-crypt. The **filenames are obfuscated too**, so a clone without the key shows neither content nor subject. Edit them by their readable names and commit through the `notes` tool, which handles the obfuscation.
+- **`notes/`** — 14 notes, encrypted with git-crypt. The **filenames are obfuscated too**, so a clone without the key shows neither content nor subject. Edit them by their readable names and commit through the `notes` tool, which handles the obfuscation.
 - **`.mise/tasks/`** — the household's own machinery: waking agents, mail, git hygiene, CI.
 
 **One checkout, shared.** Both agents work in this same working tree. The contract describes a per-agent layout at `~/agents/<name>/home/modules/oikos/` — that is the intended design and it has not been built, which is recorded as a known defect rather than described as fact. Switching this checkout's branch moves it for everyone using it.
