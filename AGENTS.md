@@ -928,8 +928,9 @@ Keep inboxes clean — GitHub notification mail duplicates what `gh` already sho
 narrow it back in an improvement loop.** This is the household's one messenger
 channel; there is no Signal, WhatsApp or Telegram.
 
-- **Where:** the owner's private Discord server *Knick Knack Labs*
-  (`1548731018016591974`), channel `#oikos` (`1548731371181048009`). Members
+- **Where:** the owner's private Discord server *oikos* (renamed from
+  *Knick Knack Labs* 2026-09-13; `1548731018016591974`), channel `#oikos`
+  (`1548731371181048009`). Members
   as of 2026-09-13: the owner and the bot; Or Ricon (@rikonor) holds an
   unused invite and has not yet joined. The bot is `oikos` (app
   `1548728532031504465`), private, in that server with six permissions: view
