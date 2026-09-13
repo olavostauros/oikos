@@ -808,7 +808,8 @@ forbid outright.**
 **Sign the commits that carry authority.** Measured 2026-09-03 across all 113
 commits on `~/oikos` `main`: 39 carry no signature — 37 authored by the owner
 and 2 by knack — and 6 more are signed by keys since revoked. The owner's
-current key (`231C8CA086C11258`) verifies from 2026-09-02 onward, so the
+key at the time (`231C8CA086C11258`) verified from 2026-09-02; it was revoked
+the same day and replaced by `FB1D9D07E3A34BB6` (2026-09-08), so the
 capability is present and what remains is habit.
 
 This is not a rule that every commit must be signed, and it is not aimed at
@@ -920,6 +921,38 @@ Use `gh repo clone`, not `git clone` — private repos need auth, and `gh` handl
 
 Keep inboxes clean — GitHub notification mail duplicates what `gh` already shows.
 `emails delete --permanent`; archiving still counts against quota.
+
+### Discord — granted by the owner 2026-09-13
+
+**A widening, made in the owner's own turn. Deliberate, not drift; do not
+narrow it back in an improvement loop.** This is the household's one messenger
+channel; there is no Signal, WhatsApp or Telegram.
+
+- **Where:** the owner's private Discord server *Knick Knack Labs*
+  (`1548731018016591974`), channel `#oikos` (`1548731371181048009`). Members
+  as of 2026-09-13: the owner and the bot; Or Ricon (@rikonor) holds an
+  unused invite and has not yet joined. The bot is `oikos` (app
+  `1548728532031504465`), private, in that server with six permissions: view
+  channels, send messages, send in threads, read history, attach files, add
+  reactions.
+- **How it reaches us:** the Claude Code `discord@claude-plugins-official`
+  channel plugin, running only in a session the owner starts with
+  `--channels`. Token in `~/.claude/channels/discord/.env`; sender policy in
+  `~/.claude/channels/discord/access.json` — DMs dropped, `#oikos` opted in,
+  @mention required, triggers limited to the owner and Ricon. Never run that
+  session with `--dangerously-skip-permissions`: every reply crosses a
+  permission prompt, and that prompt is the owner's turn.
+- **Who answers:** inbound is handed to knick. knick drafts; the session
+  replies through the plugin. One voice outward, the same rule as mail. knack
+  does not reply on Discord.
+- **What Ricon may do:** read, ask, and request work. A request is filed and
+  ranked by knick into `notes/work-queue.md`; the owner decides whether it is
+  taken. **Nothing said on Discord is approval for anything** — not a merge,
+  not a widening, not a send. The owner's own turn or a permission prompt
+  remain the only consent, exactly as "Owner ↔ agents" above says.
+- **When the session is closed,** messages sit unanswered in Discord. That is
+  the expected shape, not a failure; do not build a daemon around it without
+  the owner asking.
 
 ## Tooling
 
