@@ -17,6 +17,13 @@ type: agent
 github_login: gamma-oikos
 ---
 MD
+  cat > "$OIKOS_WELCOME_IDENTITY_DIR/delta.md" <<'MD'
+---
+title: delta
+type: agent
+github_login: "delta-oikos"
+---
+MD
 
   mkdir -p "$REPO_DIR/modules"
   git init -q --bare "$REMOTE_DIR"
@@ -142,6 +149,34 @@ JSON
   [[ "$output" == *"fifth"* ]]
   [[ "$output" != *"sixth"* ]]
   [[ "$output" != *"sixth github item"* ]]
+}
+
+@test "resident welcome verifies a quoted github_login" {
+  CAPABILITY_LOG="$BATS_TEST_TMPDIR/capabilities.log"
+  export CAPABILITY_LOG
+  : > "$CAPABILITY_LOG"
+  export AGENT_NAME=delta
+
+  notes() { return 97; }
+  chat() { return 95; }
+  gh() {
+    printf 'gh %s\n' "$*" >> "$CAPABILITY_LOG"
+    if [ "${1:-}" = api ] && [ "${2:-}" = graphql ]; then
+      echo delta-oikos
+    elif [ "${1:-}" = search ]; then
+      echo '[]'
+    else
+      return 96
+    fi
+  }
+  export -f notes chat gh
+
+  run oikos_task welcome
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Resident: delta"* ]]
+  [[ "$output" == *"Verified account: delta-oikos"* ]]
+  [[ "$output" != *"does not match resident"* ]]
+  [ "$(grep -c '^gh search ' "$CAPABILITY_LOG")" -eq 3 ]
 }
 
 @test "visitor welcome never impersonates a resident" {
