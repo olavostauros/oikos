@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+#MISE description="Send a chat message and mirror it to Discord as the sending agent"
+#USAGE flag "--as <as>" help="Your identity (default: $CHAT_IDENTITY)" default=""
+#USAGE flag "--chat <chat>" help="Chat name (default: $CHAT_CHANNEL or default)" default=""
+#USAGE flag "-f --force" help="Send even if there are unread messages" default=#false
+#USAGE flag "--msg <msg>" help="The message to send (or pipe input)" default=""
+#USAGE example "mise run chat:send --as knick --msg 'PR is up'" header="Send as knick, mirrored to Discord as the knick bot"
+#USAGE example "echo 'on it' | mise run chat:send --as knack --chat den" header="Send from stdin to a named chat"
+set -euo pipefail
+
+# The local `chat` file is the source of truth; Discord is a one-way mirror
+# so the owner can read along in the server. Nothing is ever read back from
+# Discord, and a failed mirror never unsends the local message — it warns.
+#
+# Each agent posts as its own Discord app so the sender is unforgeable. The
+# token is `<agent>/discord-token` in secrets; the channel is
+# OIKOS_DISCORD_CHAT_CHANNEL from mise.toml. Missing either means "not
+# mirrored", not "not sent".
+
+chat_bin="${CHAT:-chat}"
+secrets_bin="${SECRETS:-secrets}"
+curl_bin="${CURL:-curl}"
+
+sender="${usage_as:-${CHAT_IDENTITY:-}}"
+if [ -z "$sender" ]; then
+  echo "chat:send: identity required. Use --as <name> or set \$CHAT_IDENTITY." >&2
+  exit 1
+fi
+
+if [ -n "${usage_msg:-}" ]; then
+  message="$usage_msg"
+elif ! [ -t 0 ]; then
+  message="$(cat)"
+else
+  echo "chat:send: no message provided. Use --msg or pipe input." >&2
+  exit 1
+fi
+
+args=(send --as "$sender")
+[ -n "${usage_chat:-}" ] && args+=(--chat "$usage_chat")
+[ "${usage_force:-false}" = "true" ] && args+=(--force)
+
+# Local send first. Its own guards (identity, size, read-before-send) apply
+# unchanged and its exit status is ours.
+printf '%s' "$message" | "$chat_bin" "${args[@]}"
+
+channel="${OIKOS_DISCORD_CHAT_CHANNEL:-}"
+if [ -z "$channel" ]; then
+  echo "chat:send: not mirrored — OIKOS_DISCORD_CHAT_CHANNEL is unset" >&2
+  exit 0
+fi
+
+if ! token="$("$secrets_bin" get "$sender/discord-token" 2>/dev/null)" || [ -z "$token" ]; then
+  echo "chat:send: not mirrored — no secret $sender/discord-token" >&2
+  exit 0
+fi
+
+# Name the chat only when it isn't the default one, so the Discord channel
+# reads like the local file does.
+content="$message"
+if [ -n "${usage_chat:-}" ] && [ "$usage_chat" != "default" ]; then
+  content="[$usage_chat] $message"
+fi
+
+# Discord caps a message at 2000 characters. chat's 10-line guard already ran
+# and doesn't imply that, so clip here rather than fail after the local send.
+if [ "${#content}" -gt 2000 ]; then
+  content="${content:0:1999}…"
+fi
+
+status="$(
+  printf '%s' "$content" \
+    | jq -Rs '{content: .}' \
+    | "$curl_bin" -sS -o /dev/null -w '%{http_code}' \
+        -X POST "https://discord.com/api/v10/channels/$channel/messages" \
+        -H "Authorization: Bot $token" \
+        -H 'Content-Type: application/json' \
+        --data-binary @-
+)" || status="curl-failed"
+
+case "$status" in
+  2??) echo "Mirrored to Discord." ;;
+  *) echo "chat:send: sent locally, but the Discord mirror failed ($status)" >&2 ;;
+esac

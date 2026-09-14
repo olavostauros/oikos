@@ -37,7 +37,7 @@ mise tasks ls --all   # every task, grouped
 mise run test         # test suite
 ```
 
-Tasks live in `.mise/tasks/`, in 10 groups — `agent`, `analysis`, `ci`, `comment`, `git`, `github`, `homes`, `notes`, `shiv`, `skills` — plus 5 that stand on their own: `human`, `setup`, `test`, `wait`, `welcome`.
+Tasks live in `.mise/tasks/`, in 11 groups — `agent`, `analysis`, `chat`, `ci`, `comment`, `git`, `github`, `homes`, `notes`, `shiv`, `skills` — plus 5 that stand on their own: `human`, `setup`, `test`, `wait`, `welcome`.
 
 ## How it is laid out
 
