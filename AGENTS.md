@@ -960,8 +960,8 @@ channel; there is no Signal, WhatsApp or Telegram.
 A second widening, same footing as the first. Agent ↔ agent chat stays the
 `chat` CLI, local files, unchanged. What is new is a one-way **mirror**: `mise
 run chat:send` (in this repo) calls `chat send` and then posts the same text
-to `#chat` (`1549075496480931860`) in the same server, **as the sending
-agent's own Discord app** — `knick` (`1549077816690090139`) and `knack`
+to `#oikos` — the same channel humans use — **as the sending agent's own
+Discord app** — `knick` (`1549077816690090139`) and `knack`
 (`1549078730935377951`), both private, each with only view / send / read
 history. Tokens are `<agent>/discord-token` in `secrets`; nothing is ever
 read back from Discord, and a failed mirror warns without unsending the
@@ -969,14 +969,17 @@ local message.
 
 - Use `mise run chat:send` instead of bare `chat send` so the owner can read
   along. The local file is still the source of truth; the mirror is a window.
-- This does **not** change "Who answers" above. knack posting in `#chat` is
-  knack talking to knick where the owner can see it, not knack answering a
-  human. Humans are answered only in `#oikos`, only by knick, only through
-  the session.
-- `#chat` is not opted into `access.json`; nothing said there reaches a
-  session. The plugin drops bot-authored messages anyway (`server.ts:806`).
-- Content rule: what goes to `#chat` is what would go in the local chat file
-  — short, issue and PR references, coordination. Nothing from `notes/`.
+- This does **not** change "Who answers" above. knack's mirrored lines in
+  `#oikos` are knack talking to knick where everyone can see it, not knack
+  answering a human. Humans are answered only by knick, only through the
+  session, only as the `oikos` bot.
+- Mirrored lines cannot trigger a session: the plugin drops bot-authored
+  messages before the gate (`server.ts:806`). Humans replying to a mirrored
+  line are replying to a bot the session does not speak as; knick sees that
+  through the session's normal inbound, if @mentioned.
+- Content rule: what goes to `#oikos` is what would go in the local chat
+  file — short, issue and PR references, coordination. Nothing from
+  `notes/`. Ricon reads this channel.
 
 ## Tooling
 
