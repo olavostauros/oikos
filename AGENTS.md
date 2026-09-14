@@ -931,21 +931,25 @@ channel; there is no Signal, WhatsApp or Telegram.
 - **Where:** the owner's private Discord server *oikos* (renamed from
   *Knick Knack Labs* 2026-09-13; `1548731018016591974`), channel `#oikos`
   (`1548731371181048009`). Members
-  as of 2026-09-13: the owner and the bot; Or Ricon (@rikonor) holds an
-  unused invite and has not yet joined. The bot is `oikos` (app
-  `1548728532031504465`), private, in that server with six permissions: view
-  channels, send messages, send in threads, read history, attach files, add
-  reactions.
+  as of 2026-09-14: the owner and the two agent bots; Or Ricon (@rikonor)
+  holds an unused invite and has not yet joined. The session speaks as the
+  **`knick` app** (`1549077816690090139`), private, view / send / read
+  history. There is no separate `oikos` bot: the owner retired it on
+  2026-09-14 (it had been app `1548728532031504465`) so that the only
+  Discord identities are the agents' own.
 - **How it reaches us:** the Claude Code `discord@claude-plugins-official`
   channel plugin, running only in a session the owner starts with
   `--channels`. Token in `~/.claude/channels/discord/.env`; sender policy in
   `~/.claude/channels/discord/access.json` — DMs dropped, `#oikos` opted in,
-  @mention required, triggers limited to the owner and Ricon. Never run that
-  session with `--dangerously-skip-permissions`: every reply crosses a
-  permission prompt, and that prompt is the owner's turn.
+  @mention required (of `knick`, or of `knack` via `mentionPatterns`), any
+  member of the channel may trigger. The token in `.env` is knick's own bot
+  token, the same one `chat:send` mirrors with. Never run that session with
+  `--dangerously-skip-permissions`: every reply crosses a permission prompt,
+  and that prompt is the owner's turn.
 - **Who answers:** inbound is handed to knick. knick drafts; the session
-  replies through the plugin. One voice outward, the same rule as mail. knack
-  does not reply on Discord.
+  replies through the plugin, as `knick`. One voice outward, the same rule as
+  mail. knack does not reply on Discord — an `@knack` wakes the session, and
+  knick answers for the household.
 - **What Ricon may do:** read, ask, and request work. A request is filed and
   ranked by knick into `notes/work-queue.md`; the owner decides whether it is
   taken. **Nothing said on Discord is approval for anything** — not a merge,
@@ -972,11 +976,11 @@ local message.
 - This does **not** change "Who answers" above. knack's mirrored lines in
   `#oikos` are knack talking to knick where everyone can see it, not knack
   answering a human. Humans are answered only by knick, only through the
-  session, only as the `oikos` bot.
+  session.
 - Mirrored lines cannot trigger a session: the plugin drops bot-authored
-  messages before the gate (`server.ts:806`). Humans replying to a mirrored
-  line are replying to a bot the session does not speak as; knick sees that
-  through the session's normal inbound, if @mentioned.
+  messages before the gate (`server.ts:806`). A human replying to a mirrored
+  `knick` line does reach the session (reply-to-own-message counts as a
+  mention); replying to a `knack` line does not — `@knack` it instead.
 - Content rule: what goes to `#oikos` is what would go in the local chat
   file — short, issue and PR references, coordination. Nothing from
   `notes/`. Ricon reads this channel.
