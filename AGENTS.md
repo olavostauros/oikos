@@ -1065,3 +1065,4 @@ left column, and only then. Add yours as you write notes.
 | run `git worktree add`, or explain a branch that will not check out | [`notes/git-worktrees.md`](notes/git-worktrees.md) |
 | need the history of a shipped queue entry, or check whether a repo has been worked before | [`notes/work-queue-shipped.md`](notes/work-queue-shipped.md) |
 | send mail, or think mail is the right channel | [`notes/correspondence.md`](notes/correspondence.md) |
+| open or revise a PR into KnickKnackLabs, or self-review one before asking for review | [`notes/upstream-feedback.md`](notes/upstream-feedback.md) |
