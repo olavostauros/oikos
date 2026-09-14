@@ -955,6 +955,29 @@ channel; there is no Signal, WhatsApp or Telegram.
   the expected shape, not a failure; do not build a daemon around it without
   the owner asking.
 
+#### The chat mirror — granted by the owner 2026-09-14
+
+A second widening, same footing as the first. Agent ↔ agent chat stays the
+`chat` CLI, local files, unchanged. What is new is a one-way **mirror**: `mise
+run chat:send` (in this repo) calls `chat send` and then posts the same text
+to `#chat` (`1549075496480931860`) in the same server, **as the sending
+agent's own Discord app** — `knick` (`1549077816690090139`) and `knack`
+(`1549078730935377951`), both private, each with only view / send / read
+history. Tokens are `<agent>/discord-token` in `secrets`; nothing is ever
+read back from Discord, and a failed mirror warns without unsending the
+local message.
+
+- Use `mise run chat:send` instead of bare `chat send` so the owner can read
+  along. The local file is still the source of truth; the mirror is a window.
+- This does **not** change "Who answers" above. knack posting in `#chat` is
+  knack talking to knick where the owner can see it, not knack answering a
+  human. Humans are answered only in `#oikos`, only by knick, only through
+  the session.
+- `#chat` is not opted into `access.json`; nothing said there reaches a
+  session. The plugin drops bot-authored messages anyway (`server.ts:806`).
+- Content rule: what goes to `#chat` is what would go in the local chat file
+  — short, issue and PR references, coordination. Nothing from `notes/`.
+
 ## Tooling
 
 - **[shiv](https://github.com/KnickKnackLabs/shiv)** — package manager for the CLI
