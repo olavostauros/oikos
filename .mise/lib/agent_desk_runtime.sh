@@ -56,6 +56,23 @@ agent_desk_runtime_activate_target() {
   eval "$identity_shell"
   unset identity_shell
 
+  # Correct shimmer's hardcoded @ricon.family domain to this household's.
+  # agent:env is an oikos task; AGENT_DESK_OIKOS_ROOT is passed by the wake launcher.
+  if [ -n "${AGENT_DESK_OIKOS_ROOT:-}" ] && command -v mise >/dev/null 2>&1; then
+    agent_env_shell=$(cd "$AGENT_DESK_OIKOS_ROOT" && mise run -q agent:env "$AGENT_DESK_AGENT") || return $?
+    eval "$agent_env_shell"
+    unset agent_env_shell
+    # Drop shimmer's transient Git config overrides so the prepared home's
+    # committed config is what we verify below.
+    unset GIT_CONFIG_COUNT GIT_CONFIG_PARAMETERS
+    for v in $(compgen -A variable GIT_CONFIG_KEY_ 2>/dev/null || true); do
+      unset "$v"
+    done
+    for v in $(compgen -A variable GIT_CONFIG_VALUE_ 2>/dev/null || true); do
+      unset "$v"
+    done
+  fi
+
   [ -n "${AGENT_HOME:-}" ] || \
     agent_desk_runtime_error "shimmer did not set AGENT_HOME"
   actual_home=$(cd "$AGENT_HOME" && pwd -P)
