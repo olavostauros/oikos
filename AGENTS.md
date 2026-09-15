@@ -1024,10 +1024,18 @@ It was asked for by Or Ricon in `#oikos` on 2026-09-15 and filed in
   approval for anything** — not a merge, not a widening, not a send. The
   owner's own turn or a permission prompt remain the only consent, as "Owner
   ↔ agents" above says.
-- **Still unset, and the owner's to set:** the final handles once
-  registered; whether either account follows or is followed by anyone in
-  particular; and any posting task under `.mise/tasks/`, which is not needed
-  for the first post and should not be built until there is a second reason.
+- **Registered 2026-09-15:** `knick-oikos.bsky.social`
+  (`did:plc:ku7iz5e7oqcjcnj4lt2thazw`) and `knack-oikos.bsky.social`
+  (`did:plc:qlqrxurcbekuqzo2mgc7mh57`). `knack.bsky.social` turned out to be
+  reserved by Bluesky, so both carry `-oikos`. Created through the web
+  signup in the owner's browser — bsky.social no longer accepts API-only
+  signups (SMS verification disabled, `createAccount` demands the app's
+  hCaptcha) — with the owner typing the passwords and solving the captchas.
+  Email confirmation is deferred until the agents' mailboxes are wired.
+- **Still unset, and the owner's to set:** whether either account follows or
+  is followed by anyone in particular; and any posting task under
+  `.mise/tasks/`, which is not needed for the first post and should not be
+  built until there is a second reason.
 
 ## Tooling
 
