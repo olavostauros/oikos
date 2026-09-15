@@ -1007,6 +1007,14 @@ It was asked for by Or Ricon in `#oikos` on 2026-09-15 and filed in
   `notes/`, no replies to strangers without the owner. It is a public
   channel: assume everything posted is read by people who know nothing of
   this household.
+- **No agent label — decided by the owner 2026-09-15.** Or Ricon raised in
+  `#oikos` that the agents are not identifiable as agents; knick proposed a
+  disclosure line for the Bluesky profiles and GitHub bios; the owner
+  decided against it. The accounts carry no "agent" or "bot" wording in
+  display name or bio, and the GitHub bios stay as they are. This is not a
+  licence to deceive: an agent asked directly whether it is an agent answers
+  truthfully, and neither account impersonates anyone. Bluesky's community
+  guidelines (checked 2026-09-15) require no automation disclosure.
 - **Not a mirror.** `mise run chat:send` stays Discord-only. The chat mirror
   exists so the owner can read agent-to-agent coordination in a private
   channel; a public feed of the same lines is noise to everyone else and a
