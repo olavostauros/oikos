@@ -4,6 +4,19 @@ oikos_welcome_normalize_identity() {
   printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | tr ' ' '-'
 }
 
+oikos_welcome_frontmatter_value() {
+  awk -F ': *' -v key="$2" '
+    $1 == key {
+      value = $2
+      sub(/[[:space:]]+$/, "", value)
+      sub(/^["'\'']/, "", value)
+      sub(/["'\'']$/, "", value)
+      print value
+      exit
+    }
+  ' "$1"
+}
+
 oikos_welcome_resident_metadata() {
   local identity_dir="$1"
   local hint="$2"
@@ -13,9 +26,9 @@ oikos_welcome_resident_metadata() {
   note_path="$identity_dir/${normalized}.md"
   [ -n "$normalized" ] && [ -f "$note_path" ] || return 1
 
-  note_type=$(awk -F ': *' '$1 == "type" { print $2; exit }' "$note_path")
+  note_type=$(oikos_welcome_frontmatter_value "$note_path" type)
   [ "$note_type" = "agent" ] || return 1
-  github_login=$(awk -F ': *' '$1 == "github_login" { print $2; exit }' "$note_path")
+  github_login=$(oikos_welcome_frontmatter_value "$note_path" github_login)
 
   printf '%s\t%s\n' "$normalized" "$github_login"
 }
